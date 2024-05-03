@@ -1,0 +1,15 @@
+.container-prod{
+    background-color: #0b0b0ba3;
+      border-radius: 25px;      
+    
+      .parrf-prod, .list-prod{
+        color: #eeeeee;
+        text-shadow: #272727 10px 0 10px ;
+    
+    }
+    .section-title-prod {
+        color: #f5f4f4;
+        text-shadow: #272727 10px 0 10px ;
+
+      }
+ }

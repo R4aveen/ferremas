@@ -1,0 +1,49 @@
+.card {
+    max-width: 400px;
+    max-height: 700px;
+    margin: auto;
+    margin-top: 100px;
+    background-color: #F1741AF5;
+    border-radius: 20px;
+    padding: 20px; 
+}
+.txt{
+    color: #ccc;
+}
+.btns {
+    display: flex;
+    justify-content: space-evenly;
+    margin-top: 20px; 
+}
+
+.btnes {
+    background: #4b4b4b94;
+    border-radius: 15px;
+    color: aliceblue;
+    padding: 10px 20px; 
+    border: none; 
+    cursor: pointer; 
+    text-transform: uppercase;
+    text-decoration: none;
+}
+
+.btnes:hover {
+    background: #1aa9f1a2; 
+}
+.form-control{
+    box-shadow: -4px -1px -2px rgba(0, 0, 0, 0.721);
+}
+.form-control::placeholder {
+    color: #3e3e3e;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.721);
+}
+
+.form-control::before {
+    content: attr(placeholder);
+    position: absolute;
+    top: 0;
+    left: 0;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+    visibility: hidden;
+    color: transparent;
+}

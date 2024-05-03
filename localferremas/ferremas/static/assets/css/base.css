@@ -1,0 +1,193 @@
+
+*,*:after, *:before{
+    margin: 0;
+    padding: 0;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+  }
+
+#contenedor_carga{
+    background-color: rgb(250, 240, 245, 0.9);
+    height: 100%;
+    width: 100%;
+    position: fixed;
+    -webkit-transition: all 1s ease;
+    -o-transition: all 1s ease;
+    transition: all 1s ease;
+    z-index: 10000;
+}
+
+#carga{
+    border: 15px solid #ccc;
+    border-top-color: #f4266A;
+    border-top-style: groove;
+    height: 100px;
+    width: 100px;
+    border-radius: 100%;
+
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    margin: auto;
+    -webkit-animation: girar 1.5s linear infinite;
+    -o-animation: girar 1.5s linear infinite;
+    animation:  girar 1.5s linear infinite;
+}
+
+@keyframes girar {
+    from {transform: rotate(0deg);}
+    to {transform: rotate(360deg);}
+}
+
+  .site-header {
+      background-color: #fff;
+      position: absolute; 
+      width: 100%; 
+      z-index: 1000;
+      transition: background-color 0.3s; 
+  }
+  
+  .slick-title{
+    color: #f7f5f4;
+    text-shadow: #272727 10px 0 10px ;
+    text-align:  initial;
+    padding: 30px;
+
+
+  }
+
+  .slick-custom {
+      position: relative;
+      overflow: hidden;
+  }
+  
+.container-title{
+  margin-left: 50px;
+  
+  
+  .text-header{
+    text-align: initial;
+
+    .lead{
+      padding: 30px;
+    }
+
+    .btn{
+      padding: 30px;
+    }
+    .custom-btn:hover{
+      padding : 30px;
+    }
+  }
+
+}
+  .cont-header {
+      text-align: center; 
+      padding: 5rem 0; 
+  }
+  
+ 
+  .slick-bottom {
+      background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent); 
+      position: absolute;
+      z-index: -1;
+      bottom: 0;
+      right: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      padding: 5rem 0; 
+  }
+  
+
+  .slick-bottom .containerr {
+      text-align: center; 
+  }
+
+  .btn {
+    position: relative;
+    background: rgba(90, 90, 90, 0.214);
+    border-radius: 50px;
+    color: #fff;
+    padding: 16px 20px;
+    font-size: 16px;
+    text-transform: uppercase;
+    transition: background-color 0.3s, color 0.3s;
+    filter: blur(2px);
+    padding: 30px;
+  }
+  
+  .btn:before {
+    content: '';
+    background: inherit;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    filter: blur(5px); 
+    border-radius: inherit; 
+    z-index: -1;
+  }
+  
+  .spans {
+    position: relative;
+    z-index: 1;
+  }
+  
+  .custom-btn:hover {
+      background: #FF4400;
+      color: #fff;
+      filter: none;
+      padding: 50px;
+  }
+  
+  /*
+  
+  Estilos para el footer 
+   
+  */
+  .container {
+    background-color: #d8d8d84c;
+      border-radius: 25px;
+  }
+
+
+  
+  
+  footer {
+      margin-top: 100px;
+      display: flex;
+      flex-direction: row;
+      flex-wrap: nowrap;
+      justify-content: space-around;
+      max-height: 600px;
+      background-color: black;
+      color: rgb(255, 255, 255);
+  }
+  
+  .footer-list a {
+      display: flex;
+      flex-direction: column;
+      padding: 5px 0px;
+  }
+  
+  .site-footer {
+      background: black;
+      padding-top: 5rem;
+      padding-bottom: 5rem;
+  }
+  
+  
+
+  /* 
+  
+   pre carga con spinner
+
+  */
+
+
+

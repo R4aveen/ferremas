@@ -1,0 +1,165 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block css %}
+{% endblock %}
+
+{% block contenido %}
+
+
+<!-- 
+
+--------- SECCION DE SOBRE NOSOTROS
+
+ -->
+
+<section>
+<div class="we-help-section">
+        <div class="container ">
+        <div class="row ">
+            <div class="col-lg-7 mt-5 ">
+                <div class="imgs-grid ">
+                    <div class="grid grid-1"><img src="{%static 'assets/img/3.webp' %}" alt=""></div>
+                    <div class="grid grid-2"><img src="{%static 'assets/img/1.jpg' %}" alt=""></div>
+                    <div class="grid grid-3"><img src="{%static 'assets/img/2.jpg' %}" alt=""></div>
+                </div>
+            </div>
+
+            <div class="col-lg-5 ps-lg-5">
+                <hr class="linea mt-5">
+                <h2 class="section-title mt-4">Sobre Nosotros</h2>
+                <p class="parrf">Descubramos quienes somos</p>
+                <p class="parrf">Lorem ipsum dolor sit amet consectetur. Nibh amet mi nullam mauris commodo mus euismod. Lacus in curabitur scelerisque amet eu enim. Arcu consectetur venenatis mauris enim rhoncus.</p>
+    
+                <ul class="list-unstyled custom-list my-4 mt 5">
+                    <li class="list">Lorem ipsum dolor sit amet consectetur. Nibh amet mi</li>
+                    <li class="list">Lorem ipsum dolor sit amet consectetur. Nibh amet mi</li>
+                    <li class="list">Lorem ipsum dolor sit amet consectetur. Nibh amet mi</li>
+                    <li class="list">Lorem ipsum dolor sit amet consectetur. Nibh amet mi</li>
+                </ul>
+                <p><a onclick="eliminarProducto()" class="btn custom-btn">
+                    <span class="spans">Explorar</span>
+                </a></p>
+            </hr>
+            </div>
+        </div>
+    </div>
+</div>
+</section>
+
+
+<!-- 
+
+--------- SECCION DE PRODUCTOS
+
+El primero debe contener infromacion por encima de la imagen
+Cambiar los 3 siguientes deben contener los 3 productos recomendados 
+
+ -->
+
+<section class="container">
+    <div class="mt-5 my-4 mt-md-0 my-md-0">
+        <h1 class="section-title">Nuestros paquetes </h1>
+        <p class="parrf">Todo lo que necesitas con nosotros</p>
+    </div>
+    <div class="row justify-content-center mb-3 pb-1">
+        <div class="col-md-3 my-5 mt-md-2">
+            <div class="card" style="height: 350px;"  >
+                <a href="{% url 'productos' %}" style="height: 350px;">
+                    <img class="card-img-top" src="{%static 'assets/img/1.jpg' %}" alt="Card image cap" style="max-height: 100%;">
+                </a>
+            </div>
+        </div>
+        <div class="col-md-3 mb-4">
+            <div class="card" style="height: 350px;">
+                <img class="card-img-top" src="{%static 'assets/img/1.jpg' %}" alt="Card image cap" style="height: 100%;">
+            </div>
+        </div>
+        <div class="col-md-3 mb-4">
+            <div class="card" style="height: 350px;">
+                <img class="card-img-top" src="{%static 'assets/img/1.jpg' %}" alt="Card image cap" style="height: 100%;">
+            </div>
+        </div>
+        <div class="col-md-3 mb-4">
+            <div class="card" style="height: 350px;">
+                <img class="card-img-top" src="{%static 'assets/img/1.jpg' %}" alt="Card image cap" style="height: 100%;">
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 
+
+--------- SECCION DE PAQUETES 
+
+ -->
+
+ <section>
+    <div class="we-help-section">
+        <div class="container">
+            <div class="row ">
+
+                <div class="col-lg-5 ps-lg-5">
+                    <hr class="linea"></hr>
+                    <h2 class="section-title mb-4">Sobre Nosotros</h2>
+                    <p class="parrf">Descubramos quienes somos</p>
+                    <p class="parrf">Lorem ipsum dolor sit amet consectetur. Nibh amet mi nullam mauris commodo mus euismod. Lacus in curabitur scelerisque amet eu enim. Arcu consectetur venenatis mauris enim rhoncus.</p>
+        
+                    <ul class="list-unstyled custom-list my-4">
+                        <li class="list">Lorem ipsum dolor sit amet consectetur. Nibh amet mi</li>
+                        <li class="list">Lorem ipsum dolor sit amet consectetur. Nibh amet mi</li>
+                        <li class="list">Lorem ipsum dolor sit amet consectetur. Nibh amet mi</li>
+                        <li class="list">Lorem ipsum dolor sit amet consectetur. Nibh amet mi</li>
+                    </ul>
+                    <p><a onclick="eliminarProducto()" class="btn custom-btn">
+                        <span class="spans">Explorar</span>
+                    </a></p>
+                </div>
+
+                <div class="col-lg-7 mb-5 mb-lg-0">
+                    <hr class="linea-naranja"></hr> <!-- Línea naranja de separación -->
+                    <div class="imgs-grid-custom"> <!-- Nueva clase para contener las imágenes -->
+                        <div class="grid-custom"><img src="{%static 'assets/img/1.jpg' %}" alt=""></div> <!-- Nueva clase para la primera imagen -->
+                        <div class="grid-custom"><img src="{%static 'assets/img/2.jpg' %}" alt=""></div> <!-- Nueva clase para la segunda imagen -->
+                    </div>
+                </div>
+    
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 
+
+---------------- SECCION DE TESTIMONIOS 
+
+ -->
+ <section class="container">
+    <div class="mt-5 my-4 mt-md-0 my-md-0">
+        <h1 class="section-title">Testimonios</h1>
+        <p class="parrf">Total confianza con nuestro clientes</p>
+    </div>
+    <div class="row justify-content-center mb-3 pb-1">
+        <div class="col-md-3 mb-4">
+            <div class="card" style="height: 350px;">
+                <img class="card-img-top" src="{%static 'assets/img/persona1.jpeg' %}" alt="Card image cap" style="height: 100px; width: 100px; border-radius: 100%;">
+                <div>
+                    
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-4">
+            <div class="card" style="height: 350px;">
+                <img class="card-img-top" src="{%static 'assets/img/persona2.jpg' %}" alt="Card image cap" style="height: 100px; width: 100px; border-radius: 100%;">
+            </div>
+        </div>
+        <div class="col-md-3 mb-4">
+            <div class="card" style="height: 350px;">
+                <img class="card-img-top" src="{%static 'assets/img/persona3.jpg' %}" alt="Card image cap" style="height: 100px; width: 100px; border-radius: 100%;">
+            </div>
+        </div>
+    </div>
+</section>
+
+
+{% endblock %}

@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block css %}
+        <link rel="stylesheet" href="{% static 'static/assets/css/login.css' %}">
+{% endblock css %}
+
+{% block contenido %}
+    <div class="card">
+        <h2 class="text-center txt my-2">Iniciar sesión</h2>
+        <div class="card-body">
+            <form class="mx-auto" action="{% url 'LOGIN'%}" method="POST">
+                {% csrf_token %}
+                <input name="username" type="text" class="form-control my-4" placeholder="Nombre de usuario">
+                <input name="password" type="password" class="form-control my-2" placeholder="Contraseña">
+                <div class="btns">
+                    <input type="submit" value="Enviar" class="btnes btn-primary">
+                    <a href="{% url 'REGISTER' %}" class="btnes btn-primary">registrarse!</a>
+                </div>
+            </form>
+            <div class="mt-3">
+                <p style="color: #ccc;">¿Olvidaste tu contraseña? <a style="text-decoration: none;" href="#" >Click aquí</a></p>
+            </div>
+
+            
+        </div>
+    </div>
+    {% endblock %}

@@ -1,6 +1,19 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import logout,authenticate,login as login_aut
 from django.contrib.auth.models import User
+from .models import *
+from .forms import *
+import requests
+from rest_framework import viewsets
+from .serializers import *
+
+class ProductoViewset(viewsets.ModelViewSet):
+    queryset = Producto.objects.all()
+    serializer_class = ProductoSerializer
+class TipoProductoViewset(viewsets.ModelViewSet):
+    queryset = TipoProducto.objects.all()
+    serializer_class = TipoProductoSerializer
+
 # Create your views here.
 def index(request):
     return render(request, 'index.html')
@@ -39,5 +52,18 @@ def register(request):
             print()
     return render(request, '../templates/registration/register.html')
 
+
+
 def productos(request):
-    return render(request, 'productos.html')
+    response = requests.get('http://127.0.0.1:8000/api/productos/')
+
+    data = response.json()
+    listado_productos = data
+
+
+    context = {
+        'listado': listado_productos,
+            }
+
+        
+    return render(request, 'productos.html', context)

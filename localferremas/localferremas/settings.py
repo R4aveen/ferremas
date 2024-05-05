@@ -133,7 +133,24 @@ STATIC_URL = '/static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+# --------------------------------------------------------------------------------
 
+CRISPY_TEMPLATE_PACK = 'bootstrap5'
+X_FRAME_OPTIONS = 'SAMEORIGIN'
+## python manage.py migrate
+
+## CONFIGURACION CARPETA DE IMAGENES
+
+MEDIA_URL = "/media/"
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+## CONFIGURANDO EL SISTEMA DE MENSAJERIA DE DJANBGO
+MESSAGE_STORAGE = "django.contrib.messages.storage.cookie.CookieStorage"
+
+## CONFIGURANDO EL LOGIN
+
+LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/'
 
 ## JAZZMIN
 JAZZMIN_SETTINGS = {
@@ -162,7 +179,7 @@ JAZZMIN_SETTINGS = {
     "welcome_sign": "Bienvenido!",
 
     # Copyright on the footer
-    "copyright": "PetStoreDuoc",
+    "copyright": "Ferremas",
 
     # List of model admins to search from the search bar, search bar omitted if excluded
     # If you want to use a single search field you dont need to use a list, you can use a simple string 

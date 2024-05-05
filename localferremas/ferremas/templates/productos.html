@@ -3,22 +3,54 @@
 
 {% block css %}
 <link rel="stylesheet" href="{% static '../static/assets/css/productos.css' %}">
+<link rel="stylesheet" href="{% static '../static/assets/css/productos.scss' %}">
+
 {% endblock css %}
 
 {% block contenido %}
-
-<!-- 
-
-------------- PRODUCTOOOOOO
-
- -->
-
 <section>
     
     <div class="container-prod">
         <div class="mt-5 my-4">
-            <h1 class="section-title-prod">Nuestros paquetes </h1>
+            <h1 class="section-title-prod ml-3">Nuestros paquetes </h1>
             <p class="parrf-prod">Todo lo que necesitas con nosotros</p>
+        </div>
+
+        <div class="untree_co-section product-section before-footer-section">
+            <div class="container">
+                <div class="row">
+                    {% for aux in listado %}
+                        <div class="col-6 col-md-2 col-lg-1 mb-5">
+                            <div class="product-item">
+                                {% if aux.imagen %}
+                                <img class="img-fluid product-thumbnail" src="{{ aux.imagen }}">
+                            {% else %}
+                                <img src="{%static 'assets/img/productos/herramientas/1.jpg' %}" class="img-fluid product-thumbnail">
+                            {% endif %}
+                                <h3 class="product-title">{{ aux.nombre }}</h3>
+                                <h3 class="product-title">{{ aux.descripcion }}</h3>
+                                {% if aux.stock > 1 %}
+                                    <p>Stock: {{ aux.stock }}</p>
+                                    <strong class="product-price">${{ aux.precio }}</strong>
+                                {% else %}
+                                    <p>Producto agotado</p>
+                                {% endif %}
+                                
+                                {% comment %} <div class="product-buttons">
+                                     <form action="{% url 'añadir_carro' aux.id %}" method="post">
+                                        {% csrf_token %}
+                                        {% if aux.stock > 1 %}
+                                            <button type="submit" class="btn btn-primary">Añadir al carrito</button>
+                                        {% else %}
+                                            <button type="button" class="btn btn-secondary" onclick="showSoldOutAlert()">Sin producto</button>
+                                        {% endif %}
+                                    </form>  {% endcomment %}
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
         </div>
 
     </div>

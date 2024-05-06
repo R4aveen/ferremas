@@ -25,9 +25,8 @@ def index(request):
     listado_productos = response1.json()
     listado_productos2 = response2.json()
 
-    # Unificar listas de productos
     for producto in listado_productos:
-        producto['en_oferta'] = False  # Asignar False a todos los productos por defecto
+        producto['en_oferta'] = False  
 
     for producto_oferta in listado_productos2:
         for producto in listado_productos:

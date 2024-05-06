@@ -7,6 +7,7 @@ import requests
 from rest_framework import viewsets
 from .serializers import *
 
+
 class ProductoViewset(viewsets.ModelViewSet):
     queryset = Producto.objects.all()
     serializer_class = ProductoSerializer
@@ -14,9 +15,22 @@ class TipoProductoViewset(viewsets.ModelViewSet):
     queryset = TipoProducto.objects.all()
     serializer_class = TipoProductoSerializer
 
-# Create your views here.
+class ProductoOfertaViewset(viewsets.ModelViewSet):
+    queryset = ProductoOferta.objects.all()
+    serializer_class = ProductoOfertaSerializer
+
 def index(request):
-    return render(request, 'index.html')
+    response = requests.get('http://127.0.0.1:8000/api/Producto%20en%20oferta/')
+    listado_productos = response.json()
+
+
+
+
+    context = {
+        'listado': listado_productos  
+    }
+
+    return render(request, 'index.html', context)
 
 def login(request):
     if request.POST:

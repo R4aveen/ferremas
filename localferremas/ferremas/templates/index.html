@@ -72,21 +72,19 @@ Cambiar los 3 siguientes deben contener los 3 productos recomendados
                 </a>
             </div>
         </div>
-        <div class="col-md-3 mb-4">
-            <div class="card" style="height: 350px;">
-                <img class="card-img-top" src="{%static 'assets/img/1.jpg' %}" alt="Card image cap" style="height: 100%;">
-            </div>
-        </div>
-        <div class="col-md-3 mb-4">
-            <div class="card" style="height: 350px;">
-                <img class="card-img-top" src="{%static 'assets/img/1.jpg' %}" alt="Card image cap" style="height: 100%;">
-            </div>
-        </div>
-        <div class="col-md-3 mb-4">
-            <div class="card" style="height: 350px;">
-                <img class="card-img-top" src="{%static 'assets/img/1.jpg' %}" alt="Card image cap" style="height: 100%;">
-            </div>
-        </div>
+        {%  for aux in listado %}
+            {% if forloop.counter <= 3 %}
+                <div class="col-md-3 mb-4">
+                    <div class="card" style="height: 350px;">
+                        {% if aux.imagen.en_oferta %}
+                        <img class="card-img-top" src="{{ aux.imagen }}" alt="Card image cap" style="height: 100%;">
+                        {% else %}
+                        <img class="card-img-top" src="{%static 'assets/img/1.jpg' %}" alt="Card image cap" style="height: 100%;">
+                        {% endif %}
+                    </div>
+                </div>
+            {% endif %}
+        {% endfor %}
     </div>
 
 </div>

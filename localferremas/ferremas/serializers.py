@@ -7,9 +7,15 @@ class TipoProductoSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class ProductoSerializer(serializers.ModelSerializer):
-        # agregar las claves foraneas
     tipo = TipoProductoSerializer(read_only=True)
 
     class Meta:
         model = Producto
+        fields = '__all__'
+
+class ProductoOfertaSerializer(serializers.ModelSerializer):
+    tipo = ProductoSerializer(read_only=True)
+
+    class Meta:
+        model = ProductoOferta
         fields = '__all__'

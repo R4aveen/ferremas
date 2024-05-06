@@ -20,17 +20,28 @@ class ProductoOfertaViewset(viewsets.ModelViewSet):
     serializer_class = ProductoOfertaSerializer
 
 def index(request):
-    response = requests.get('http://127.0.0.1:8000/api/Producto%20en%20oferta/')
-    listado_productos = response.json()
+    response1 = requests.get('http://127.0.0.1:8000/api/productos/')
+    response2 = requests.get('http://127.0.0.1:8000/api/Producto%20en%20oferta/')
+    listado_productos = response1.json()
+    listado_productos2 = response2.json()
 
+    # Unificar listas de productos
+    for producto in listado_productos:
+        producto['en_oferta'] = False  # Asignar False a todos los productos por defecto
 
+    for producto_oferta in listado_productos2:
+        for producto in listado_productos:
+            if producto['id'] == producto_oferta['producto']:
+                producto['precio_oferta'] = producto_oferta['precio_oferta']
+                producto['en_oferta'] = True
 
 
     context = {
-        'listado': listado_productos  
+        'listado': listado_productos,
     }
 
     return render(request, 'index.html', context)
+
 
 def login(request):
     if request.POST:

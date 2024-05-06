@@ -12,7 +12,9 @@
  .section-title-prod {
   color: #f5f4f4;
   text-shadow: #272727 10px 0 10px ;
-
+  background-color: #000000;
+  padding: 10px 30px 2px;
+  text-align: justify;
 }
 
  .product-section {
@@ -71,7 +73,7 @@
       right: 0;
       position: absolute;
       content: "";
-      background: #c0872485;
+      background: #ffffff;
       height: 0%;
       z-index: -1;
       border-radius: 10px;

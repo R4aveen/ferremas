@@ -2,9 +2,7 @@
 {% load static %}
 
 {% block css %}
-<link rel="stylesheet" href="{% static '../static/assets/css/productos.css' %}">
-<link rel="stylesheet" href="{% static '../static/assets/css/productos.scss' %}">
-
+<link rel="stylesheet" href="{% static 'assets/css/productos.css' %}">
 {% endblock css %}
 
 {% block contenido %}
@@ -23,7 +21,7 @@
                 <div class="row">
                     {% for aux in listado %}
                         <div class="col-12 col-md-4 mb-5">
-                            <div class="product-item" >
+                            <div class="product-item">
                                 {% if aux.imagen %}
                                     <img class="img-fluid product-thumbnail" src="{{ aux.imagen }}" style="max-width: 300px; max-height: 300px;">
                                 {% else %}
@@ -31,25 +29,20 @@
                                 {% endif %}
                                 <h3 class="product-title">{{ aux.nombre }}</h3>
                                 <h3 class="product-title">{{ aux.descripcion }}</h3>
-                                {% if aux.stock > 1 %}
-                                    <p>Stock: {{ aux.stock }}</p>
-                                    <strong class="product-price">${{ aux.precio }}</strong>
-                                {% else %}
-                                    <p>Producto agotado</p>
-                                {% endif %}
-                                
-                                {% comment %} <div class="product-buttons">
-                                    <form action="{% url 'añadir_carro' aux.id %}" method="post">
-                                       {% csrf_token %}
-                                       {% if aux.stock > 1 %}
-                                           <button type="submit" class="btn btn-primary">Añadir al carrito</button>
-                                       {% else %}
-                                           <button type="button" class="btn btn-secondary" onclick="showSoldOutAlert()">Sin producto</button>
-                                       {% endif %}
-                                   </form>  
-                                {% endcomment %}                            
-                                
-                                </div>
+                                <p>Stock: {{ aux.stock }}</p>
+                                <strong class="product-price">${{ aux.precio }}</strong>
+                                <form id="agregar-al-carrito-form-{{ aux.id }}" method="POST" action="{% url 'agregar_al_carrito' %}">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="producto_id" value="{{ aux.id }}">
+                                    <button type="submit" class="btn btn-primary" {% if aux.stock == 0 %} disabled {% endif %}>
+                                        {% if aux.stock == 0 %}
+                                            Sin stock
+                                        {% else %}
+                                            Agregar al carrito
+                                        {% endif %}
+                                    </button>
+                                </form>
+                            </div>
                         </div>
                         {% if forloop.counter|divisibleby:3 and not forloop.last %}
                             </div></div><div class="container"><div class="row">
@@ -62,5 +55,11 @@
     </div>
 
 </section>
+
+<script>
+    function agregarAlCarrito(productoId) {
+        document.getElementById('agregar-al-carrito-form-' + productoId).submit();
+    }
+</script>
 
 {% endblock %}

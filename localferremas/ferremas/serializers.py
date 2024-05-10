@@ -19,3 +19,8 @@ class ProductoOfertaSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductoOferta
         fields = '__all__'
+
+class CarritoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Carrito
+        fields = '__all__'

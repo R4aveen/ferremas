@@ -7,6 +7,7 @@ router = routers.DefaultRouter()
 router.register('productos', ProductoViewset)
 router.register('Tipos de producto', TipoProductoViewset)
 router.register('Producto en oferta', ProductoOfertaViewset)
+router.register('Carrito de compras', CarritoViewset)
 
 urlpatterns = [
     path('', index, name="index"),
@@ -14,6 +15,12 @@ urlpatterns = [
     path('register/', register, name='REGISTER'),
     path('productos/', productos, name='productos'),
     path('api/', include(router.urls)),
+    path('carrito/', carrito_de_compras, name='carrito_de_compras'),
+
+    path('agregar-al-carrito/', agregar_al_carrito, name='agregar_al_carrito'),
+    path('api/carrito/eliminar/<int:carrito_id>/', eliminar_del_carrito, name='eliminar_del_carrito'),
+    path('api/carrito/decrementar/<int:carrito_id>/', decrementar_cantidad_carrito, name='decrementar_cantidad_carrito'),
+
 
     ]
 

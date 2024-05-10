@@ -1,0 +1,142 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static '../static/assets/css/productos.css' %}">
+<link rel="stylesheet" href="{% static '../static/assets/css/productos.scss' %}">
+{% endblock css %}
+
+{% block contenido %}
+<section>    
+    <div class="container-prod">
+        <div class="mt-5 my-4">
+            <div> 
+                <h1 class="section-title-prod ml-3">Tu carrito de compras</h1>
+                <p class="parrf-prod">Revisa los productos que has agregado al carrito</p>
+            </div>
+        </div>
+
+        <div class="product-section before-footer-section">
+            <div class="container">
+                <div class="row">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>imagen</th>
+                                <th>Producto</th>
+                                <th>Precio</th>
+                                <th>Cantidad</th>
+                                <th>Subtotal</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Aquí se llenarán dinámicamente los elementos del carrito -->
+                            {% for item in carrito %}
+                            <tr id="item_{{ item.id }}">
+                                <td>{{ item.producto.imagen }}</td>
+                                <td>{{ item.producto.nombre }}</td>
+                                <td>${{ item.producto.precio }}</td>
+                                <td id="cantidad_{{ item.id }}">{{ item.cantidad }}</td>
+                                <td>${{ item.producto.precio|floatformat:"2" }}</td> <!-- Aquí puedes dejar solo el precio -->
+
+                                <td>
+                                    <button class="btn btn-secondary btn-sm" onclick="decrementarCantidad({{ item.id }}, {{ item.cantidad }})">
+                                        <i class="fas fa-minus"></i>
+                                    </button>
+                                    <button class="btn btn-secondary btn-sm" onclick="agregarAlCarrito({{ item.producto.id }})">
+                                        <i class="fas fa-plus"></i>
+                                    </button>
+                                    <button class="btn btn-danger btn-sm ml-2" onclick="eliminarDelCarrito({{ item.id }})">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+<script>
+    function agregarAlCarrito(productoId) {
+        fetch('/agregar-al-carrito/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: `producto_id=${productoId}`
+        })
+        .then(response => {
+            if (response.ok) {
+                return response.json();
+            } else {
+                throw new Error('Error al agregar el producto al carrito');
+            }
+        })
+        .then(data => {
+            // Actualizar la cantidad en el carrito
+            document.getElementById(`cantidad_${data.id}`).innerText = data.cantidad;
+        })
+        .catch(error => console.error('Error:', error));
+    }
+
+    function decrementarCantidad(carritoId, cantidad) {
+        if (cantidad > 0) {
+            fetch(`/api/carrito/decrementar/${carritoId}/`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')
+                }
+            })
+            .then(response => {
+                if (response.ok) {
+                    return response.json();
+                } else {
+                    throw new Error('Error al decrementar la cantidad del carrito');
+                }
+            })
+            .then(data => {
+                // Actualizar la cantidad en el carrito
+                document.getElementById(`cantidad_${carritoId}`).innerText = data.cantidad;
+            })
+            .catch(error => console.error('Error:', error));
+        }
+    }
+
+    function eliminarDelCarrito(carritoId) {
+        fetch(`/api/carrito/eliminar/${carritoId}/`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            }
+        })
+        .then(response => {
+            if (response.ok) {
+                return response.json();
+            } else {
+                throw new Error('Error al eliminar el producto del carrito');
+            }
+        })
+        .then(data => {
+            // Actualizar la cantidad de productos restantes en el carrito
+            document.getElementById('cantidad_productos_carrito').innerText = data.productos_restantes;
+            // Hacer que la fila del carrito se desvanezca antes de eliminarla
+            const filaCarrito = document.getElementById(`item_${carritoId}`);
+            filaCarrito.style.transition = 'opacity 0.5s ease';
+            filaCarrito.style.opacity = '0';
+            // Esperar un breve período antes de eliminar la fila del carrito
+            setTimeout(() => {
+                filaCarrito.remove();
+            }, 500);
+        })
+        .catch(error => console.error('Error:', error));
+    }
+</script>

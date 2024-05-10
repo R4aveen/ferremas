@@ -60,33 +60,50 @@ Cambiar los 3 siguientes deben contener los 3 productos recomendados
 <section >
 <div class="we-help-section" style="background: linear-gradient(#000000,#1b272d, #476a7a, #476a7a);">
 <div class="container"> 
-    <div class="mt-5 my-4 mt-md-0 my-md-0 " >
-        <h1 class="section-title mt-4">Nuestros paquetes </h1>
+    <div class="col-lg-5 ps-lg-5" >
+        <h1 class="section-title mt-4">Productos </h1>
         <p class="parrf">Todo lo que necesitas con nosotros</p>
     </div>
     <div class="row justify-content-center mb-3 pb-1">
         <div class="col-md-3 my-5 mt-md-2">
-            <div class="card" style="height: 350px;"  >
-                <a href="{% url 'productos' %}" style="height: 350px;">
-                    <img class="card-img-top" src="{%static 'assets/img/1.jpg' %}" alt="Card image cap" style="max-height: 100%;">
+            <div class="tarjeta">
+                <a href="{% url 'productos' %}" class="enlace-tarjeta">
+                    <img class="imagen-tarjeta" src="{% static 'assets/img/1.jpg' %}" alt="Imagen de la tarjeta">
+                    <div class="superposicion-degradado"></div>
+                    <div class="superposicion-texto">
+                        <h3>Productos en oferta</h3>
+                        <p>Ve nuestro catalogo de productos aqui</p>
+                    </div>
+                    <a href="{% url 'productos' %}" class="btn-prod">hola</a>
+
                 </a>
             </div>
         </div>
-        <div class="col-md-3 mb-4">
-            <div class="card" style="height: 350px;">
-                <img class="card-img-top" src="{%static 'assets/img/1.jpg' %}" alt="Card image cap" style="height: 100%;">
+        
+        
+        {% for producto in listado  %}
+        {% if producto.en_oferta  %}
+            <div class="col-md-3 mb-4">
+                <div class="tarjeta">
+                    <div class="imagen-tarjeta">
+                        {% if producto.imagen %}
+                            <img src="{{ producto.imagen }}" alt="{{ producto.nombre }}">
+                        {% else %}
+                            <img src="{% static 'assets/img/1.jpg' %}" alt="{{ producto.nombre }}">
+                        {% endif %}
+                        <div class="superposicion-degradado"></div>
+                        <div class="superposicion-texto">
+                            <h3>{{ producto.nombre }}</h3>
+                            <strong class="precio-oferta">${{ producto.precio_oferta }}</strong>
+                        </div>
+                    </div>
+                </div>
             </div>
-        </div>
-        <div class="col-md-3 mb-4">
-            <div class="card" style="height: 350px;">
-                <img class="card-img-top" src="{%static 'assets/img/1.jpg' %}" alt="Card image cap" style="height: 100%;">
-            </div>
-        </div>
-        <div class="col-md-3 mb-4">
-            <div class="card" style="height: 350px;">
-                <img class="card-img-top" src="{%static 'assets/img/1.jpg' %}" alt="Card image cap" style="height: 100%;">
-            </div>
-        </div>
+        {% endif %}
+    {% endfor %}
+    
+    
+    
     </div>
 
 </div>
@@ -123,10 +140,10 @@ Cambiar los 3 siguientes deben contener los 3 productos recomendados
                 </div>
 
                 <div class="col-lg-7 mb-5 mb-lg-0">
-                    <hr class="linea-naranja"></hr> <!-- Línea naranja de separación -->
-                    <div class="imgs-grid-custom"> <!-- Nueva clase para contener las imágenes -->
-                        <div class="grid-custom"><img src="{%static 'assets/img/1.jpg' %}" alt=""></div> <!-- Nueva clase para la primera imagen -->
-                        <div class="grid-custom"><img src="{%static 'assets/img/2.jpg' %}" alt=""></div> <!-- Nueva clase para la segunda imagen -->
+                    <hr class="linea-naranja"></hr> 
+                    <div class="imgs-grid-custom"> 
+                        <div class="grid-custom"><img src="{%static 'assets/img/1.jpg' %}" alt=""></div> 
+                        <div class="grid-custom"><img src="{%static 'assets/img/2.jpg' %}" alt=""></div> 
                     </div>
                 </div>
     

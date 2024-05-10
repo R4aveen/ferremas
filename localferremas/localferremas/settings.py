@@ -38,7 +38,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'ferremas.apps.FerremasConfig'
+    'ferremas.apps.FerremasConfig',
+    'carrito.apps.CarritoConfig',
+    'rest_framework',
+
 ]
 
 MIDDLEWARE = [
@@ -151,6 +154,13 @@ MESSAGE_STORAGE = "django.contrib.messages.storage.cookie.CookieStorage"
 
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
+
+
+
+
+
+
+#### ---------------------------- ADMIN CUSTOMIZADO
 
 ## JAZZMIN
 JAZZMIN_SETTINGS = {

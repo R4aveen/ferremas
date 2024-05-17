@@ -1,0 +1,50 @@
+{% load static %}
+<footer>
+    <div>
+        <a href="#"><img id="logo" src="{% static 'img/logo.png' %}"></a>
+        <h2>Ferremas</h2>
+        <p>hola@gmail.com</p>
+        <p>telefono: +56 9 123 12 123</p>
+    </div>
+    <div>
+        <h2>Links</h2>
+        <div class="footer-list">
+            <a href="#">Services</a>
+            <a href="#">Portafolio</a>
+            <a href="#">About us</a>
+            <a href="#">Testimonial</a>
+        </div>
+    </div>
+</footer>
+
+<style>
+    footer {
+        margin-top: 12rem;
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        justify-content: space-around;
+        max-height: 600px;
+        background-color: black;
+        color: rgb(255, 255, 255);
+    }
+  
+    .footer-list a {
+        text-decoration: none;
+        display: flex;
+        flex-direction: column;
+        padding: 5px 0px;
+        color: white;
+    }
+
+    .footer-list a:hover{
+        text-decoration: none;
+        color: blue;
+    }
+  
+    .site-footer {
+        background: black;
+        padding-top: 5rem;
+        padding-bottom: 5rem;
+  }
+</style>

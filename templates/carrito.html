@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block css %}
+
+{% endblock css %}
+
+{% block contenido %}
+<div class="container" style="height: 35rem;">
+    <h1 class="mt-5">Carrito de Compras</h1>
+    
+    {% if items_carrito %}
+    <table>
+        <tr class="row-top">
+            <th>NOMBRE</th>
+            <th>DESCRIPCION</th>
+            <th class="text-center">CANTIDAD</th>
+            <th class="text-center">PRECIO UNITARIO</th>
+            <th class="text-center">SUB TOTAL</th>
+            <th class="text-center">FUNCIONES</th>
+        </tr>
+        {% for item in items_carrito %}
+        <tr class="row-content">
+            <td>{{ item.producto.nombre }}</td>
+            <td>{{ item.producto.descripcion }}</td>
+            <td class="text-center">
+                <a href="{% url 'DISMINUIR_CANTIDAD' item.pk %}" class="px-2">
+                    <img src="{% static 'img/remove.png' %}" style="width: 2rem; height: 2rem;">
+                </a>
+                {{ item.cantidad }}
+                <a href="{% url 'AUMENTAR_CANTIDAD' item.pk %}" class="px-2">
+                    <img src="{% static 'img/add.png' %}" style="width: 2rem; height: 2rem;">
+                </a>
+            </td>
+            <td class="text-center">$ {{ item.producto.precio }}</td>
+            <td class="text-center">{{ item.precio_total }}</td>
+            <td class="text-center">
+                <a href="{% url 'ELIMINAR_DEL_CARRITO' item.pk %}" class="btn btn-danger">Eliminar</a>
+            </td>
+        </tr>
+        {% endfor %}
+        <tr class="row-bottom">
+            <td colspan="4" class="text-end"><h3>TOTAL :</h3></td>
+            <td class="text-end" colspan="2"><h3>$ {{ total_formato }} CLP</h3></td>
+        </tr>
+    </table>
+    <a href="{% url 'VACIAR_CARRITO' %}" class="btn btn-danger mt-3">VACIAR CARRITO</a>
+    {% else %}
+    <div style="background-color: rgba(245, 245, 245, 0.849); border: solid 2px black; padding: 2rem 2rem;
+                border-radius: 3rem;">
+        <h3 style="color: red;">El carrito está vacío( Añade productos :D)</h3>
+    </div>
+    {% endif %}
+</div>
+
+<style>
+    /* DISEÑO QLIAO BUENO QUE HIZO EL CHATGPT */
+    * {
+        color: white; /* Cambiado a negro para que sea legible sobre el fondo blanco */
+    }
+    table {
+        border-collapse: collapse; /* Colapso de bordes para un aspecto más limpio */
+        width: 100%;
+        margin-top: 2rem; /* Agregado espacio en la parte superior */
+    }
+    th{
+        border: 1px solid black; /* Bordes de 1px sólido */
+        padding: 0.5rem; /* Reducido el relleno */
+        text-align: center; /* Alineación centrada */
+        color: white;
+    }
+    td {
+        border: 1px solid black; /* Bordes de 1px sólido */
+        padding: 0.5rem; /* Reducido el relleno */
+        text-align: center; /* Alineación centrada */
+        color: black;
+    }
+    .row-top {
+        background-color: black; /* Cambiado el color de fondo */
+        color: white; /* Texto en blanco para mayor contraste */
+    }
+    .row-content{
+        background-color: white;
+    }
+    .row-content:nth-child(even) {
+        background-color: lightgray; /* Fondo alternativo para mejorar la legibilidad */
+    }
+    .btn {
+        background-color: red; /* Cambiado el color de fondo del botón */
+        color: white; /* Texto en blanco para mayor contraste */
+        padding: 0.3rem 0.5rem; /* Ajuste del relleno */
+        text-decoration: none; /* Eliminado el subrayado del botón */
+        border: none; /* Eliminado el borde del botón */
+    }
+    .btn:hover {
+        background-color: darkred; /* Color de fondo cambiado al pasar el ratón */
+    }
+    .row-bottom{
+        background-color: black;
+    }
+    .row-bottom td{
+        color: white;
+    }
+</style>
+{% endblock contenido %}

@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/register.css' %}">
+{% endblock css %}
+
+{% block contenido %}
+<div class="container">
+        <div class="card">
+            <div class="mt-3" style="display: flex; align-items: center; justify-content: center;">
+                <svg width="120" height="120" viewBox="0 0 466 466" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="233" cy="233" r="233" fill="#F7F3F3" fill-opacity="0.73"/>
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M99.6394 41.9152C82.9722 53.5694 67.9006 67.3484 54.817 82.8595C108.282 77.8957 176.208 86.0009 255.07 125.432C339.283 167.537 407.095 168.961 454.289 159.858C450.007 146.892 444.615 134.431 438.23 122.586C384.205 128.284 314.946 120.742 234.23 80.3848C182.975 54.7571 137.794 44.2002 99.6394 41.9152ZM406.671 77.6665C364.008 29.9987 302.007 0 233 0C212.735 0 193.072 2.58755 174.327 7.44995C199.715 14.3771 226.684 24.5114 255.07 38.7044C314.165 68.2519 365.185 77.7656 406.671 77.6665ZM464.379 205.367C407.364 216.626 328.632 214.313 234.23 167.112C145.974 122.984 75.7301 123.54 28.355 134.068C25.9096 134.611 23.5218 135.182 21.1917 135.776C14.9891 149.265 10.038 163.451 6.48558 178.181C10.2798 177.167 14.2006 176.204 18.2458 175.304C75.7201 162.532 156.926 163.087 255.07 212.159C343.327 256.287 413.57 255.731 460.946 245.203C462.569 244.843 464.169 244.47 465.741 244.086C465.914 240.413 466 236.716 466 233C466 223.651 465.45 214.43 464.379 205.367ZM458.134 293.257C401.672 303.128 325.233 299.34 234.23 253.839C145.974 209.712 75.7301 210.267 28.355 220.795C17.8391 223.131 8.37914 225.977 0.0341345 228.982C0.0113821 230.318 0 231.658 0 233C0 361.682 104.318 466 233 466C340.845 466 431.578 392.732 458.134 293.257Z" fill="black"/>
+                </svg>
+            </div>
+            <h2 class="text-center mt-3 title">Registrate aqui!</h2>
+
+            <div class="card-body">
+                <form action="{% url 'REGISTRO' %}" method="POST">
+                    {% csrf_token %}
+                    <div class="form-space">
+                        <label for="username" class="form-label">Username</label>
+                        <input type="text" name="username" id="username" class="form-control">
+                    </div>
+                    <div class="form-space">
+                        <label for="email" class="form-label">Email</label>
+                        <input type="email" name="email" id="email" class="form-control">
+                    </div>
+                    <div class="form-space">
+                        <label for="number" class="form-label">Number</label>
+                        <input type="number" name="number" id="number" class="form-control">
+                    </div>
+                    <div class="form-space">
+                        <label for="password" class="form-label">Password</label>
+                        <input type="password" name="password" id="password" class="form-control">
+                    </div>
+                    <div class="form-space">
+                        <label for="repeat-password" class="form-label">Repeat password</label>
+                        <input type="password" name="repeat-password" id="repeat-password" class="form-control">
+                    </div>
+                    <div class="btn-submit">
+                        <input type="submit" value="Registrarse" class="btnes btn-primary">
+                    </div>
+                </form>
+                <p class="text-center" style="color:#ccc;">¿Tienes una cuenta? <a style="text-decoration:none;" href="{% url 'LOGIN' %}">Iniciar sesión</a></p>
+                </div>
+            </div>
+        </div>
+{% endblock contenido %}

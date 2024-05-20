@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import logout,authenticate,login as login_aut
 from django.contrib.auth.models import User
-from .models import CategoriaProducto, Producto, ProductoOferta, Carrito, CarritoItem
+from .models import CategoriaProducto, Producto, ProductoOferta, Carrito, CarritoItem, customeruser
 from django.contrib.auth.decorators import login_required, permission_required
 import locale
 
@@ -11,7 +11,13 @@ def base(request):
     return render(request, 'base.html')
 
 def index(request):
-    return render(request, 'index.html')
+    actual_user = request.user
+    grupo = actual_user.groups.first()
+    ctx = {
+        "grupo" : grupo
+    }
+    return render(request, 'index.html', ctx)
+
 
 def login(request):
     if request.POST:
@@ -35,7 +41,7 @@ def registro(request):
         password = request.POST.get("password")
         repeat_password = request.POST.get("repeat-password")
 
-        user = User()
+        user = customeruser()
 
         user.set_password(password)
         user.username = username

@@ -1,6 +1,16 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
+from django.contrib.auth.models import AbstractUser
+
+class Tipo_Usuario(models.Model):
+    nombre = models.CharField(max_length=20, null=False)
+
+    def __str__(self):
+        return self.nombre
+    
+class customeruser(AbstractUser):
+    tipo_usuario = models.ForeignKey(Tipo_Usuario, on_delete=models.CASCADE, null=True)
 
 # Create your models here.
 class CategoriaProducto(models.Model):
@@ -31,7 +41,7 @@ class ProductoOferta(models.Model):
         return f"{self.producto.nombre} - Precio de oferta: {self.precio_oferta}"
     
 class Carrito(models.Model):
-    usuario = models.ForeignKey(User, on_delete=models.CASCADE)
+    usuario = models.ForeignKey(customeruser, on_delete=models.CASCADE)
     creado_en = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
@@ -44,7 +54,9 @@ class CarritoItem(models.Model):
     precio = models.DecimalField(max_digits=10, decimal_places=2)
 
     def precio_total(self):
-        return self.cantidad * self.precio
-    
+        return self.cantidad * self.preci
+
+
+
 # COMUNA
 # CIUDAD

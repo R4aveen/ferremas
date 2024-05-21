@@ -70,6 +70,8 @@ def carrito_de_compras(request):
 
     return render(request, 'carrito.html', context)
 
+
+
 @api_view(['POST'])
 def agregar_al_carrito(request):
     if request.method == 'POST':
@@ -92,6 +94,7 @@ def agregar_al_carrito(request):
             return Response({'error': 'El producto seleccionado no existe.'}, status=status.HTTP_404_NOT_FOUND)
     else:
         return Response({'error': 'Método no permitido'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
 
 @api_view(['PATCH'])
 def decrementar_cantidad_carrito(request, carrito_id):

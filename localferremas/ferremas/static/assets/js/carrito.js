@@ -44,7 +44,6 @@ function decrementarCantidad(carritoId, cantidad) {
 
 
 function eliminarDelCarrito(carritoId) {
-    // Lógica para eliminar un producto del carrito
     fetch(`/api/carrito/eliminar/${carritoId}/`, {
         method: 'DELETE',
         headers: {
@@ -54,7 +53,6 @@ function eliminarDelCarrito(carritoId) {
     })
     .then(response => {
         if (response.ok) {
-            // Actualizar la interfaz de usuario para reflejar el cambio en el carrito
             cargarCarritoUsuario();
             location.reload();
 
@@ -66,7 +64,6 @@ function eliminarDelCarrito(carritoId) {
 }
 
 function actualizarCantidad(carritoId, nuevaCantidad) {
-    // Lógica para actualizar la cantidad de un producto en el carrito
     fetch(`/api/carrito/actualizar/${carritoId}/`, {
         method: 'PATCH',
         headers: {
@@ -77,7 +74,6 @@ function actualizarCantidad(carritoId, nuevaCantidad) {
     })
     .then(response => {
         if (response.ok) {
-            // Actualizar la interfaz de usuario para reflejar el cambio en el carrito
             cargarCarritoUsuario();
         } else {
             console.error('Error al actualizar la cantidad del producto en el carrito');
@@ -96,12 +92,10 @@ function cargarCarritoUsuario() {
         }
     })
     .then(data => {
-        // Aquí puedes manejar la respuesta exitosa y actualizar la interfaz de usuario con los datos del carrito
     })
     .catch(error => console.error('Error:', error));
 }
 
-// Función auxiliar para obtener el valor del token CSRF
 function getCookie(name) {
     let cookieValue = null;
     if (document.cookie && document.cookie !== '') {

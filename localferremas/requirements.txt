@@ -1,0 +1,11 @@
+django == 5.0.4
+django-rest == 0.8.7
+django-rest-framework == 0.1.0
+djangorestframework == 3.15.1
+django-admin-interface == 0.28.6
+django-crispy-forms == 2.1
+django-jazzmin == 3.0.0
+mysqlclient == 2.2.4
+django-crispy-forms == 2.1
+Pillow == 9.5.0
+transbank-sdk == 5.0.0

@@ -139,6 +139,7 @@ def disminuir_cantidad(request, id_item):
 MERCADOPAGO_ACCESS_TOKEN = 'TEST-2707703782990962-052113-2fcbf2399d53397208c61d5f0cc6c38b-1821506213'
 
 # MERCADO PAGO UWU
+@login_required(login_url='/login/')  # Asegura que el usuario esté autenticado
 def checkout(request):
     usuario = request.user
     carrito = Carrito.objects.get(usuario=usuario)
@@ -148,27 +149,32 @@ def checkout(request):
         items.append({
             "title": item.producto.nombre,
             "quantity": item.cantidad,
-            "currency_id": "CLP",  # O la moneda que estés usando
-            "unit_price": float(item.precio)
+            "currency_id": "CLP",  # Ajusta según la moneda que estés utilizando
+            "unit_price": float(item.producto.precio)  # Utiliza el precio del producto
         })
 
     sdk = mercadopago.SDK(MERCADOPAGO_ACCESS_TOKEN)
 
-    preference_data = {
-        "items": items,
-        "back_urls": {
-            "success": 'http://127.0.0.1:8000/success',
-            "failure": 'http://127.0.0.1:8000/failure',
-            "pending": 'http://127.0.0.1:8000/pending'
-        },
-        "auto_return": "approved",
-    }
-    preference_response = sdk.preference().create(preference_data)
-    preference = preference_response["response"]
+    try:
+        preference_data = {
+            "items": items,
+            "back_urls": {
+                "success": 'http://127.0.0.1:8000/success',
+                "failure": 'http://127.0.0.1:8000/failure',
+                "pending": 'http://127.0.0.1:8000/pending'
+            },
+            "auto_return": "approved",
+        }
+        preference_response = sdk.preference().create(preference_data)
+        preference = preference_response["response"]
 
-    return render(request, "payments/checkout.html", {
-        "preference_id": preference["id"]
-    })
+        return render(request, "payments/checkout.html", {
+            "preference_id": preference["id"]
+        })
+    except Exception as e:
+        # Maneja el error de manera adecuada, puede ser un log, redirección a una página de error, etc.
+        print("Error al crear la preferencia de pago:", e)
+        return redirect('CARRITO')  # Redirecciona de vuelta al carrito en caso de error
 
 
 

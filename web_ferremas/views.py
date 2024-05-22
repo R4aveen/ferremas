@@ -4,6 +4,8 @@ from django.contrib.auth.models import User
 from .models import CategoriaProducto, Producto, ProductoOferta, Carrito, CarritoItem
 from django.contrib.auth.decorators import login_required, permission_required
 import locale
+from django.conf import settings
+import mercadopago
 
 
 # Create your views here.
@@ -59,6 +61,9 @@ def productos(request):
         "ofertas" : ofertas
     }
     return render(request, 'productos.html', ctx)
+
+def crud_productos(request):
+    return render(request, 'crud_productos.html')
 
 
 ### carrito
@@ -131,3 +136,47 @@ def disminuir_cantidad(request, id_item):
     return redirect('CARRITO')
 
 ### fin carrito
+MERCADOPAGO_ACCESS_TOKEN = 'TEST-2707703782990962-052113-2fcbf2399d53397208c61d5f0cc6c38b-1821506213'
+
+# MERCADO PAGO UWU
+def checkout(request):
+    usuario = request.user
+    carrito = Carrito.objects.get(usuario=usuario)
+
+    items = []
+    for item in CarritoItem.objects.filter(carrito=carrito):
+        items.append({
+            "title": item.producto.nombre,
+            "quantity": item.cantidad,
+            "currency_id": "CLP",  # O la moneda que estés usando
+            "unit_price": float(item.precio)
+        })
+
+    sdk = mercadopago.SDK(MERCADOPAGO_ACCESS_TOKEN)
+
+    preference_data = {
+        "items": items,
+        "back_urls": {
+            "success": 'http://127.0.0.1:8000/success',
+            "failure": 'http://127.0.0.1:8000/failure',
+            "pending": 'http://127.0.0.1:8000/pending'
+        },
+        "auto_return": "approved",
+    }
+    preference_response = sdk.preference().create(preference_data)
+    preference = preference_response["response"]
+
+    return render(request, "payments/checkout.html", {
+        "preference_id": preference["id"]
+    })
+
+
+
+def success(request):
+    return render(request, "payments/success.html")
+
+def failure(request):
+    return render(request, "payments/failure.html")
+
+def pending(request):
+    return render(request, "payments/pending.html")

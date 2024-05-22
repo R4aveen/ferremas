@@ -1,0 +1,24 @@
+<!-- templates/payments/checkout.html -->
+{% extends 'base.html' %}
+{% load static %}
+
+{% block contenido %}
+<div class="container" style="height: 35rem;">
+    <h1 class="mt-5">Checkout</h1>
+    <button onclick="redirect()">Pagar con MercadoPago</button>
+    <script src="https://sdk.mercadopago.com/js/v2"></script>
+    <script>
+        const mp = new MercadoPago('TEST-237448d9-9dd4-4bd8-9dff-0a92a92c26d3', {
+            locale: 'es-CL'  // Configuración para Chile
+        });
+
+        function redirect() {
+            mp.checkout({
+                preference: {
+                    id: '{{ preference_id }}'
+                }
+            }).open();
+        }
+    </script>
+</div>
+{% endblock contenido %}

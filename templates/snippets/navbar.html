@@ -1,101 +1,145 @@
 {% load static %}
-<nav>
-    
-    <ul>
-        <a href="{% url 'INDEX' %}"><img src="{% static 'img/logo.png' %}"></a>
-        <li><a href="{% url 'INDEX' %}" class="enlace">Inicio</a></li>
-        <li><a href="{% url 'PRODUCTOS' %}" class="enlace">Productos</a></li>
-        <li><a href="#" class="enlace">Categorias</a></li>
-        <li><a href="#" class="enlace">Sobre Nosotros</a></li>
-        {% if user.is_authenticated %}
-        <li><a href="{% url 'CARRITO' %}" class="enlace">Carrito</a></li>
-        <li><a href="#" class="btn-ingresar">Mi Perfil</a></li>
-        <li><a href="{% url 'CERRAR_SESION' %}" class="btn-cerrar">Cerrar Sesion</a></li>
-        {% else %}
-        <li><a href="{% url 'LOGIN' %}" class="btn-ingresar">Ingresar</a></li>
-        {% endif %}
-    </ul>
-</nav>
+    <nav>
+        <div class="menu-icon" onclick="toggleMenu()">☰</div>
+        <ul class="menu" id="menu">
+            <li><a href="{% url 'INDEX' %}"><img src="{% static 'img/logo.png' %}" alt="Logo"></a></li>
+            <li><a href="{% url 'INDEX' %}" class="enlace">Inicio</a></li>
+            <li><a href="{% url 'PRODUCTOS' %}" class="enlace">Productos</a></li>
+            <li><a href="#" class="enlace">Categorías</a></li>
+            <li><a href="#" class="enlace">Sobre Nosotros</a></li>
+            {% if user.is_authenticated %}
+                <li><a href="{% url 'CARRITO' %}" class="enlace">Carrito</a></li>
+                <li><a href="#" class="enlace btn-ingresar">Mi Perfil</a></li>
+                <li><a href="{% url 'CERRAR_SESION' %}" class="enlace btn-cerrar">Cerrar Sesión</a></li>
+            {% else %}
+                <li><a href="{% url 'LOGIN' %}" class="enlace btn-ingresar">Ingresar</a></li>
+            {% endif %}
+        </ul>
+    </nav>
 
 <style>
-    nav{
+    nav {
         margin-top: 20px;
         display: flex;
         justify-content: center;
         height: 100px;
+        position: relative;
     }
 
-    ul{
+    ul.menu {
         display: flex;
+        flex-wrap: wrap;
         align-items: center;
         justify-content: center;
         background: linear-gradient(to top, rgba(100, 96, 96, 0.8), transparent);
         border-radius: 25px;
+        padding: 0;
+        position: relative;
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+
+    li {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+
+    img {
+        width: 100px;
+        height: 100px;
     }
 
     .enlace{
         margin: 5px;
-        padding: 20px 70px;
+        padding: 15px 30px;
         border-radius: 25px;
         text-decoration: none;
-        font-size: 20px;
+        font-size: 18px;
         color: white;
         text-shadow: 5px 5px 10px black;
-    }
-    .enlace:hover{
-        padding: 20px 70px;
-        border-radius: 25px;
-        background: white;
         text-decoration: none;
-        font-size: 20px;
-        color: black;
+    }
+    .btn-ingresar {
+        margin: 5px;
+        padding: 15px 30px;
+        border-radius: 25px;
+        text-decoration: none;
+        font-size: 18px;
+        color: white;
+        background-color: rgb(228, 115, 10);
+        text-shadow: 5px 5px 10px black;
+    }
+    .btn-cerrar {
+        margin: 5px;
+        padding: 15px 30px;
+        border-radius: 25px;
+        text-decoration: none;
+        font-size: 18px;
+        color: white;
+        background-color: rgb(235, 45, 39);
         text-shadow: 5px 5px 10px black;
     }
 
-    li{
-        list-style: none;
-    }
-    img{
-        width: 100px;
-        height: 100px;
-    }
-    .btn-ingresar{
-        margin-right: 30px;
-        padding: 20px 70px;
-        border-radius: 25px;
+    .enlace:hover{
+        background: white;
+        color: black;
         text-decoration: none;
-        font-size: 20px;
-        color: white;
-        text-shadow: 5px 5px 10px black;
-        background-color: #e95600;
     }
     .btn-ingresar:hover{
-        padding: 20px 70px;
-        border-radius: 25px;
-        background: white;
-        text-decoration: none;
-        font-size: 20px;
+        background: rgb(207, 128, 62);
         color: black;
-        text-shadow: 5px 5px 10px black;
-    }
-    .btn-cerrar{
-        margin-right: 30px;
-        padding: 20px 70px;
-        border-radius: 25px;
         text-decoration: none;
-        font-size: 20px;
-        color: white;
-        text-shadow: 5px 5px 10px black;
-        background-color: red;
     }
-    .btn-cerrar:hover{
-        margin-right: 30px;
-        padding: 20px 70px;
-        border-radius: 25px;
+    .btn-cerrar:hover {
+        background: rgb(221, 112, 112);
+        color: rgb(34, 33, 33);
         text-decoration: none;
-        font-size: 20px;
-        color: white;
-        text-shadow: 5px 5px 10px black;
-        background-color: rgb(252, 53, 53);
+    }
+
+    .menu-icon {
+        display: none;
+        font-size: 24px;
+        cursor: pointer;
+        position: absolute;
+        top: 50%;
+        left: 20px;
+        transform: translateY(-50%);
+    }
+
+    @media only screen and (max-width: 768px) {
+        .menu {
+            display: none;
+            flex-direction: column;
+            position: absolute;
+            top: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+            padding: 10px;
+        }
+        .menu.visible {
+            display: flex;
+        }
+        .menu-icon {
+            display: block;
+        }
     }
 </style>
+
+<script>
+    function toggleMenu() {
+        var menu = document.getElementById('menu');
+        menu.classList.toggle('visible');
+    }
+
+    var menuItems = document.querySelectorAll('.enlace');
+    menuItems.forEach(function(item) {
+        item.addEventListener('click', function() {
+            var menu = document.getElementById('menu');
+            menu.classList.remove('visible');
+        });
+    });
+</script>

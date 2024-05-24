@@ -10,13 +10,21 @@ class CategoriaProducto(models.Model):
     def __str__(self):
         return self.categoria
     
+class TipoProducto(models.Model):
+    id = models.AutoField(primary_key=True, auto_created=True)
+    tipo = models.CharField(max_length=30, null=False)
+
+    def __str__(self):
+        return self.tipo
+    
 class Producto(models.Model):
     id = models.AutoField(primary_key=True, auto_created=True)
     nombre = models.CharField(max_length=30, null=False)
     precio = models.IntegerField(default=0)
     stock = models.IntegerField(default=0)
     descripcion = models.TextField()
-    categoria = models.ForeignKey(CategoriaProducto, on_delete=models.CASCADE)
+    categoria = models.ManyToManyField(CategoriaProducto)
+    tipo = models.ManyToManyField(TipoProducto)
     imagen = models.ImageField(null=True, upload_to='productos/')
     en_oferta = models.BooleanField(default=False)
 

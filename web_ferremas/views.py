@@ -1,8 +1,8 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import logout,authenticate,login as login_aut
 from django.contrib.auth.models import User
-from .models import CategoriaProducto, Producto, ProductoOferta, Carrito, CarritoItem, Boleta, DetalleBoleta
-from django.contrib.auth.decorators import login_required, permission_required
+from .models import CategoriaProducto, Producto, ProductoOferta, Carrito, CarritoItem, Boleta, DetalleBoleta, TipoProducto
+from django.contrib.auth.decorators import login_required, permission_required, user_passes_test
 import locale
 from django.conf import settings
 # import mercadopago
@@ -10,6 +10,7 @@ from django.http import HttpResponseBadRequest, HttpResponse
 from transbank.webpay.webpay_plus.transaction import Transaction
 import random
 from transbank.error.transbank_error import TransbankError
+from django.core.paginator import Paginator
 
 
 # ============================================================================
@@ -137,11 +138,13 @@ def index(request):
 
 def login(request):
     if request.POST:
-        username =request.POST.get("username")
-        password =request.POST.get("password")
-        user= authenticate(request,username=username,password=password)
+        username = request.POST.get("username")
+        password = request.POST.get("password")
+        user = authenticate(request, username=username, password=password)
         if user is not None and user.is_active:
-            login_aut(request,user)
+            login_aut(request, user)
+            if user.groups.filter(name='vendedor').exists():
+                return redirect(to="vendedor")
             return redirect(to="INDEX")
     return render(request, 'login.html')
 
@@ -175,12 +178,142 @@ def registro(request):
 
 def productos(request):
     productos = Producto.objects.all()
+
+    categorias_list = CategoriaProducto.objects.all()
+
+    tipos_list = TipoProducto.objects.all()
+
     ofertas = ProductoOferta.objects.all()
+    paginator = Paginator(productos, 6) 
+
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
     ctx = {
+        "page_obj": page_obj,
         "productos" : productos,
-        "ofertas" : ofertas
+        "categorias": categorias_list,
+        "ofertas" : ofertas,
+        "tipos": tipos_list,
+
     }
     return render(request, 'productos.html', ctx)
+
+def categoriaprod(request, categoriaprod_id):
+    categoria = get_object_or_404(CategoriaProducto, id=categoriaprod_id)
+    categorias_list = CategoriaProducto.objects.all()
+
+    tipos_list = TipoProducto.objects.all()
+
+    productos = Producto.objects.filter(categoria=categoria)
+    paginator = Paginator(productos, 6) 
+
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    ctx = {
+        "page_obj": page_obj,
+        "categoria": categoria,
+        "categorias": categorias_list,
+        "tipos": tipos_list,
+
+
+    }
+    return render(request, "categoria_prod.html", ctx)
+
+def tipoprod(request, tipoprod_id):
+    tipo = get_object_or_404(TipoProducto, id=tipoprod_id)
+    tipos_list = TipoProducto.objects.all()
+
+    categorias_list = CategoriaProducto.objects.all()
+
+    productos = Producto.objects.filter(tipo=tipo)
+    paginator = Paginator(productos, 6) 
+
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    ctx = {
+        "page_obj": page_obj,
+        "tipo": tipo,
+        "tipos": tipos_list,
+        "categorias": categorias_list,
+
+
+    }
+    return render(request, "tipo_prod.html", ctx)
+
+def is_vendedor(user):
+    return user.groups.filter(name='vendedor').exists()
+
+@user_passes_test(is_vendedor, login_url='/login/')
+def vendedor(request):
+    productos_list = Producto.objects.all()
+    categorias_list = CategoriaProducto.objects.all()
+    paginator = Paginator(productos_list, 6) 
+    tipos_list = TipoProducto.objects.all()
+
+
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    ctx = {
+        "page_obj": page_obj,
+        "categorias": categorias_list,
+        "tipos": tipos_list,
+
+    }
+    return render(request, "trabajadores/vendedor/vendedor.html", ctx)
+
+@user_passes_test(is_vendedor, login_url='/login/')
+def categoria(request, categoria_id):
+    categoria = get_object_or_404(CategoriaProducto, id=categoria_id)
+    categorias_list = CategoriaProducto.objects.all()
+
+    tipos_list = TipoProducto.objects.all()
+
+    productos = Producto.objects.filter(categoria=categoria)
+    paginator = Paginator(productos, 6) 
+
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    ctx = {
+        "page_obj": page_obj,
+        "categoria": categoria,
+        "categorias": categorias_list,
+        "tipos": tipos_list,
+
+
+    }
+    return render(request, "trabajadores/vendedor/categoria.html", ctx)
+
+@user_passes_test(is_vendedor, login_url='/login/')
+def tipo(request, tipo_id):
+    tipo = get_object_or_404(TipoProducto, id=tipo_id)
+    tipos_list = TipoProducto.objects.all()
+
+    categorias_list = CategoriaProducto.objects.all()
+
+    productos = Producto.objects.filter(tipo=tipo)
+    paginator = Paginator(productos, 6) 
+
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    ctx = {
+        "page_obj": page_obj,
+        "tipo": tipo,
+        "tipos": tipos_list,
+        "categorias": categorias_list,
+
+
+    }
+    return render(request, "trabajadores/vendedor/tipo.html", ctx)
+
+
+
+
 
 def crud_productos(request):
     return render(request, 'crud_productos.html')

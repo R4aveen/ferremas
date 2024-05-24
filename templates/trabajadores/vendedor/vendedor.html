@@ -18,7 +18,7 @@
                 </button>
                 <ul class="dropdown-menu" aria-labelledby="categoriaDropdown">
                     {% for categoria in categorias %}
-                        <li><a class="dropdown-item" href="{% url 'categoriaprod' categoria.id %}">{{ categoria.categoria }}</a></li>
+                        <li><a class="dropdown-item" href="{% url 'categoria' categoria.id %}">{{ categoria.categoria }}</a></li>
                     {% endfor %}
                 </ul>
             </div>
@@ -28,7 +28,7 @@
                 </button>
                 <ul class="dropdown-menu" aria-labelledby="tipoDropdown">
                     {% for tipo in tipos %}
-                        <li><a class="dropdown-item" href="{% url 'tipoprod' tipo.id %}">{{ tipo.tipo }}</a></li>
+                        <li><a class="dropdown-item" href="{% url 'tipo' tipo.id %}">{{ tipo.tipo }}</a></li>
                     {% endfor %}
                 </ul>
             </div>

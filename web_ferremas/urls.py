@@ -9,6 +9,9 @@ urlpatterns = [
     path('registro/', registro, name='REGISTRO'),
     path('productos/', productos, name='PRODUCTOS'),
     path('crud_productos/', crud_productos, name='CRUD_PRODUCTOS'),
+    #
+    path('categoriaprod/<int:categoriaprod_id>/', categoriaprod, name="categoriaprod"),
+    path('tipoprod/<int:tipoprod_id>/', tipoprod, name="tipoprod"),
 
     # CARRITO
     path('carrito/', carrito, name='CARRITO'),
@@ -37,4 +40,10 @@ urlpatterns = [
     path('webpay-plus/status-form', show_create, name='webpay_plus_status_form'),
     path('webpay-plus/status', status, name='webpay_plus_status'),
     path('generar-boleta/', generarBoleta, name='generar_boleta'),
+
+
+    # Trabajadores
+    path('vendedor/', vendedor, name='vendedor'),
+    path('categoria/<int:categoria_id>/', categoria, name="categoria"),
+    path('tipo/<int:tipo_id>/', tipo, name="tipo"),
 ]

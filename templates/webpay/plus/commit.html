@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Resultado de Transacción</title>
+</head>
+<body>
+    <h1>Resultado de Transacción</h1>
+    <p>Status: {{ response.status }}</p>
+
+    <p>Total: {{ total }}</p>
+    <h2>Productos:</h2>
+    <ul>
+        {% for producto in productos %}
+        <li>{{ producto.nombre }} CANTIDAD: {{ producto.cantidad }} SUBTOTAL: {{ producto.subtotal }}</li>
+        {% endfor %}
+    </ul>
+
+    <a href="{% url 'CARRITO' %}">Volver a Carrito</a>
+
+</body>
+</html>

@@ -5,36 +5,20 @@
 {% block contenido %}
 <div class="container" style="height: 35rem;">
     <h1 class="mt-5">Checkout</h1>
-    <button id="btnPagar" class="btn btn-primary mt-3">Pagar con MercadoPago</button>
-</div>
+    <button onclick="redirect()">Pagar con MercadoPago</button>
+    <script src="https://sdk.mercadopago.com/js/v2"></script>
+    <script>
+        const mp = new MercadoPago('TEST-c46fd047-7957-4462-bca5-d24ea9fac09a', {
+            locale: 'es-CL'  // Configuración para Chile
+        });
 
-<script src="https://sdk.mercadopago.com/js/v2"></script>
-<script>
-    const mp = new MercadoPago('TU_ACCESS_TOKEN_DE_MERCADO_PAGO', {
-        locale: 'es-CL'  // Configuración para Chile
-    });
-
-    document.getElementById('btnPagar').addEventListener('click', function() {
-        // Realiza una solicitud al servidor para obtener la preferencia de pago
-        fetch('/checkout/preference')
-            .then(response => response.json())
-            .then(data => {
-                if (data.error) {
-                    alert("Error al obtener la preferencia de pago. Inténtalo de nuevo más tarde.");
-                    console.error(data.error);
-                } else {
-                    // Abre el flujo de pago de Mercado Pago con la preferencia obtenida
-                    mp.checkout({
-                        preference: {
-                            id: data.preference_id
-                        }
-                    }).open();
+        function redirect() {
+            mp.checkout({
+                preference: {
+                    id: '{{ preference_id }}'
                 }
-            })
-            .catch(error => {
-                alert("Error al obtener la preferencia de pago. Inténtalo de nuevo más tarde.");
-                console.error(error);
-            });
-    });
-</script>
+            }).open();
+        }
+    </script>
+</div>
 {% endblock contenido %}

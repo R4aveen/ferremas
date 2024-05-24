@@ -1,11 +1,131 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import logout,authenticate,login as login_aut
 from django.contrib.auth.models import User
-from .models import CategoriaProducto, Producto, ProductoOferta, Carrito, CarritoItem
+from .models import CategoriaProducto, Producto, ProductoOferta, Carrito, CarritoItem, Boleta, DetalleBoleta
 from django.contrib.auth.decorators import login_required, permission_required
 import locale
 from django.conf import settings
-import mercadopago
+# import mercadopago
+from django.http import HttpResponseBadRequest, HttpResponse
+from transbank.webpay.webpay_plus.transaction import Transaction
+import random
+from transbank.error.transbank_error import TransbankError
+
+
+# ============================================================================
+# WEBPAY PLUS
+# ============================================================================
+def webpay_plus_commit(request):
+    if request.method == 'GET':
+        token = request.GET.get("token_ws")
+        if token is None:
+            return HttpResponseBadRequest("El parámetro 'token_ws' es requerido en la URL.")
+
+        response = Transaction().commit(token=token)
+        productos = []
+        precio_total = 0
+        if response['status'] == 'AUTHORIZED':
+            carrito = Carrito.objects.get(usuario=request.user)
+            items_carrito = carrito.carritoitem_set.all()
+            precio_total = sum(item.cantidad * item.producto.precio for item in items_carrito)
+
+            boleta = Boleta(total=precio_total)
+            boleta.save()
+
+            for item in items_carrito:
+                producto = item.producto
+                cantidad = item.cantidad
+                subtotal = cantidad * producto.precio
+                detalle = DetalleBoleta(boleta=boleta, producto=producto, cantidad=cantidad, subtotal=subtotal)
+                detalle.save()
+                # Agregar un diccionario con información del producto a la lista de productos
+                productos.append({
+                    'nombre': producto.nombre,
+                    'cantidad': cantidad,
+                    'subtotal': subtotal
+                })
+
+            carrito.carritoitem_set.all().delete()
+
+        context = {'token': token, 'response': response, 'productos': productos, 'total': precio_total}
+        return render(request, 'webpay/plus/commit.html', context)
+    elif request.method == 'POST':
+        token = request.POST.get("token_ws")
+        response = {"error": "Transacción con errores"}
+        return render(request, 'webpay/plus/commit.html', {'token': token, 'response': response})
+
+    
+
+# INICIO TRANSACCION
+def generarBoleta(request):
+    if request.method == 'GET':
+        carrito = Carrito.objects.get_or_create(usuario=request.user)[0]
+        items_carrito = carrito.carritoitem_set.all()
+        if not items_carrito:
+            return render(request, 'webpay/plus/error.html', {'error': 'El carrito está vacío'})
+
+        precio_total = sum(item.cantidad * item.producto.precio for item in items_carrito)
+        buy_order = str(random.randrange(1000000, 99999999))
+        session_id = str(random.randrange(1000000, 99999999))
+        return_url = request.build_absolute_uri('/webpay-plus/commit')
+
+        try:
+            response = Transaction().create(buy_order, session_id, precio_total, return_url)
+            return render(request, 'webpay/plus/create.html', {'response': response})
+        except Exception as e:
+            return render(request, 'webpay/plus/error.html', {'error': str(e)})
+    else:
+        return render(request, 'webpay/plus/error.html', {'error': 'Método HTTP no permitido'})
+    
+# ERROR EN LA TRANSACCION
+def webpay_plus_commit_error(request):
+    return HttpResponse("Error en la transacción de pago")
+
+# 
+def webpay_plus_refund(request):
+    if request.method == 'POST':
+        token = request.POST.get("token_ws")
+        amount = request.POST.get("amount")
+
+        try:
+            response = Transaction().refund(token, amount)
+            return render(request, "webpay/plus/refund.html", {'token': token, 'amount': amount, 'response': response})
+        except TransbankError as e:
+            return render(request, 'webpay/plus/error.html', {'error': str(e)})
+        
+# 
+def webpay_plus_refund_form(request):
+    return render(request, 'webpay/plus/refund-form.html')
+
+#
+def webpay_plus_refund_form(request):
+    return render(request, 'webpay/plus/refund-form.html')
+
+#
+def status(request):
+    token_ws = request.POST.get('token_ws')
+    tx = Transaction()
+    resp = tx.status(token_ws)
+    return render(request, 'webpay/plus/status.html', {'response': resp, 'token': token_ws, 'req': request.POST})
+
+#
+def show_create(request):
+    return render(request, 'webpay/plus/status-form.html')
+
+#
+def webpay_plus_create(request):
+    if request.method == 'GET':
+        buy_order = str(random.randrange(1000000, 99999999))
+        session_id = str(random.randrange(1000000, 99999999))
+        amount = random.randrange(10000, 1000000)
+        return_url = request.build_absolute_uri('/webpay-plus/commit')
+
+        response = Transaction().create(buy_order, session_id, amount, return_url)
+        return render(request, 'webpay/plus/create.html', {'response': response})
+
+# ============================================================================
+
+
 
 
 # Create your views here.
@@ -136,53 +256,56 @@ def disminuir_cantidad(request, id_item):
     return redirect('CARRITO')
 
 ### fin carrito
-MERCADOPAGO_ACCESS_TOKEN = 'TEST-2707703782990962-052113-2fcbf2399d53397208c61d5f0cc6c38b-1821506213'
+# MERCADOPAGO_ACCESS_TOKEN = 'TEST-2707703782990962-052210-1c16fe9d61ba257bc74b01bf7721ba4a-1821506213'
 
 # MERCADO PAGO UWU
-@login_required(login_url='/login/')  # Asegura que el usuario esté autenticado
-def checkout(request):
-    usuario = request.user
-    carrito = Carrito.objects.get(usuario=usuario)
+# @login_required(login_url='/login/')  # Asegura que el usuario esté autenticado
+# def checkout(request):
+#     usuario = request.user
+#     try:
+#         carrito = Carrito.objects.get(usuario=usuario)
+#     except Carrito.DoesNotExist:
+#         # Maneja el caso en que el carrito no existe para el usuario
+#         return redirect('CARRITO')
 
-    items = []
-    for item in CarritoItem.objects.filter(carrito=carrito):
-        items.append({
-            "title": item.producto.nombre,
-            "quantity": item.cantidad,
-            "currency_id": "CLP",  # Ajusta según la moneda que estés utilizando
-            "unit_price": float(item.producto.precio)  # Utiliza el precio del producto
-        })
+#     items = []
+#     for item in CarritoItem.objects.filter(carrito=carrito):
+#         items.append({
+#             "title": item.producto.nombre,
+#             "quantity": item.cantidad,
+#             "currency_id": "CLP",  # Ajusta según la moneda que estés utilizando
+#             "unit_price": float(item.producto.precio)  # Utiliza el precio del producto
+#         })
 
-    sdk = mercadopago.SDK(MERCADOPAGO_ACCESS_TOKEN)
+#     sdk = mercadopago.SDK(MERCADOPAGO_ACCESS_TOKEN)
 
-    try:
-        preference_data = {
-            "items": items,
-            "back_urls": {
-                "success": 'http://127.0.0.1:8000/success',
-                "failure": 'http://127.0.0.1:8000/failure',
-                "pending": 'http://127.0.0.1:8000/pending'
-            },
-            "auto_return": "approved",
-        }
-        preference_response = sdk.preference().create(preference_data)
-        preference = preference_response["response"]
+#     try:
+#         preference_data = {
+#             "items": items,
+#             "back_urls": {
+#                 "success": 'http://127.0.0.1:8000/success/',
+#                 "failure": 'http://127.0.0.1:8000/failure/',
+#                 "pending": 'http://127.0.0.1:8000/pending/'
+#             },
+#             "auto_return": "approved",
+#         }
+#         preference_response = sdk.preference().create(preference_data)
+#         preference = preference_response["response"]
 
-        return render(request, "payments/checkout.html", {
-            "preference_id": preference["id"]
-        })
-    except Exception as e:
-        # Maneja el error de manera adecuada, puede ser un log, redirección a una página de error, etc.
-        print("Error al crear la preferencia de pago:", e)
-        return redirect('CARRITO')  # Redirecciona de vuelta al carrito en caso de error
+#         return render(request, "payments/checkout.html", {
+#             "preference_id": preference["id"]
+#         })
+#     except Exception as e:
+#         # Maneja el error de manera adecuada, puede ser un log, redirección a una página de error, etc.
+#         print("Error al crear la preferencia de pago:", e)
+#         return redirect('CARRITO')
 
 
+# def success(request):
+#     return render(request, "payments/success.html")
 
-def success(request):
-    return render(request, "payments/success.html")
+# def failure(request):
+#     return render(request, "payments/failure.html")
 
-def failure(request):
-    return render(request, "payments/failure.html")
-
-def pending(request):
-    return render(request, "payments/pending.html")
+# def pending(request):
+#     return render(request, "payments/pending.html")

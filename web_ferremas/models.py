@@ -46,5 +46,15 @@ class CarritoItem(models.Model):
     def precio_total(self):
         return self.cantidad * self.precio
     
+class Boleta(models.Model):
+    total = models.PositiveIntegerField()
+    fecha = models.DateTimeField(auto_now_add=True)
+
+class DetalleBoleta(models.Model):
+    boleta = models.ForeignKey(Boleta, on_delete=models.CASCADE)
+    producto = models.ForeignKey(Producto, on_delete=models.CASCADE)
+    cantidad = models.PositiveIntegerField()
+    subtotal = models.PositiveIntegerField()
+    
 # COMUNA
 # CIUDAD

@@ -23,8 +23,18 @@ urlpatterns = [
     path('disminuir/<int:id_item>/', disminuir_cantidad, name='DISMINUIR_CANTIDAD'),
 
     # MERCADO PAGO
-    path('checkout/', checkout, name='checkout'),
-    path('success/', success, name='success'),
-    path('failure/', failure, name='failure'),
-    path('pending/', pending, name='pending'),
+    # path('checkout/', checkout, name='checkout'),
+    # path('success/', success, name='success'),
+    # path('failure/', failure, name='failure'),
+    # path('pending/', pending, name='pending'),
+
+    # WEBPAY PLUS
+    path('webpay-plus/create', webpay_plus_create, name='webpay_plus_create'),
+    path('webpay-plus/commit', webpay_plus_commit, name='webpay_plus_commit'),
+    path('webpay-plus/commit-error', webpay_plus_commit_error, name='webpay_plus_commit_error'),
+    path('webpay-plus/refund', webpay_plus_refund, name='webpay_plus_refund'),
+    path('webpay-plus/refund-form', webpay_plus_refund_form, name='webpay_plus_refund_form'),
+    path('webpay-plus/status-form', show_create, name='webpay_plus_status_form'),
+    path('webpay-plus/status', status, name='webpay_plus_status'),
+    path('generar-boleta/', generarBoleta, name='generar_boleta'),
 ]

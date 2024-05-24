@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'web_ferremas',
+    'transbank'
 ]
 
 MIDDLEWARE = [
@@ -130,6 +131,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# settings.py
-# settings.py
-
+# WEBPAY PLUS
+WEBPAY_PLUS_COMMERCE_CODE = '597055555532'  # Código de comercio de prueba
+WEBPAY_PLUS_API_KEY = 'b89576d6b4c1e2f1f1d3dbd23a75c3af'  # Clave API de prueba
+WEBPAY_PLUS_ENVIRONMENT = 'TEST'

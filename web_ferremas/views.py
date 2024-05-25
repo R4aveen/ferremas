@@ -11,6 +11,8 @@ from transbank.webpay.webpay_plus.transaction import Transaction
 import random
 from transbank.error.transbank_error import TransbankError
 from django.core.paginator import Paginator
+import random
+from django.http import JsonResponse
 
 
 # ============================================================================
@@ -133,8 +135,17 @@ def webpay_plus_create(request):
 def base(request):
     return render(request, 'base.html')
 
+import random
+
 def index(request):
-    return render(request, 'index.html')
+    productos_oferta = Producto.objects.filter(en_oferta=True).order_by('?')[:3]
+    categorias_random = CategoriaProducto.objects.order_by('?')[:3]
+    
+    ctx = {
+        'productos_oferta': productos_oferta,
+        'categorias_random': categorias_random,
+    }
+    return render(request, 'index.html', ctx)
 
 def login(request):
     if request.POST:
@@ -242,6 +253,11 @@ def tipoprod(request, tipoprod_id):
 
     }
     return render(request, "tipo_prod.html", ctx)
+
+def productos_por_categoria(request, categoria_id):
+    productos = Producto.objects.filter(categoria=categoria_id)
+    data = [{'nombre': producto.nombre, 'precio': producto.precio} for producto in productos]
+    return JsonResponse(data, safe=False)
 
 def is_vendedor(user):
     return user.groups.filter(name='vendedor').exists()

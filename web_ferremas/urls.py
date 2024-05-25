@@ -12,6 +12,8 @@ urlpatterns = [
     #
     path('categoriaprod/<int:categoriaprod_id>/', categoriaprod, name="categoriaprod"),
     path('tipoprod/<int:tipoprod_id>/', tipoprod, name="tipoprod"),
+    path('productos_por_categoria/<int:categoria_id>/', productos_por_categoria, name='productos_por_categoria'),
+
 
     # CARRITO
     path('carrito/', carrito, name='CARRITO'),

@@ -43,3 +43,23 @@ class Carrito(models.Model):
 
     class Meta:
         unique_together = ['usuario', 'producto']
+
+
+class Pedido(models.Model):
+    usuario = models.ForeignKey(User, on_delete=models.CASCADE)
+    fecha_pedido = models.DateTimeField(default=timezone.now)
+    productos = models.ManyToManyField('Producto', through='DetallePedido')
+    total = models.DecimalField(max_digits=10, decimal_places=2)
+
+    def __str__(self):
+        return f"Pedido #{self.pk} - Usuario: {self.usuario.username} - Total: {self.total}"
+
+
+class DetallePedido(models.Model):
+    pedido = models.ForeignKey(Pedido, on_delete=models.CASCADE)
+    producto = models.ForeignKey('Producto', on_delete=models.CASCADE)
+    cantidad = models.PositiveIntegerField(default=1)
+    precio_unitario = models.DecimalField(max_digits=10, decimal_places=2)
+
+    def __str__(self):
+        return f"Pedido #{self.pedido.pk} - Producto: {self.producto.nombre} - Cantidad: {self.cantidad}"

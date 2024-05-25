@@ -2,8 +2,7 @@
 {% load static %}
 
 {% block css %}
-<link rel="stylesheet" href="{% static '../static/assets/css/productos.css' %}">
-<link rel="stylesheet" href="{% static '../static/assets/css/productos.scss' %}">
+<link rel="stylesheet" href="{% static 'assets/css/productos.css' %}">
 {% endblock css %}
 
 {% block contenido %}
@@ -34,7 +33,7 @@
                             <!-- Aquí se llenarán dinámicamente los elementos del carrito -->
                             {% for item in carrito %}
                             <tr id="item_{{ item.id }}">
-                                <td>{{ item.producto.imagen }}</td>
+                                <td><img src="{{ item.producto.imagen.url }}" alt="{{ item.producto.nombre }}" style="max-width: 100px;"></td>
                                 <td>{{ item.producto.nombre }}</td>
                                 <td>${{ item.producto.precio }}</td>
                                 <td id="cantidad_{{ item.id }}">{{ item.cantidad }}</td>
@@ -55,6 +54,11 @@
                             {% endfor %}
                         </tbody>
                     </table>
+                    <form method="post" action="https://webpay3gint.transbank.cl/webpayserver/initTransaction">
+                        {% csrf_token %}
+                        <!-- Botón de pago -->
+                        <button type="submit" class="btn btn-primary">Pagar</button>
+                    </form>
                 </div>
             </div>
         </div>

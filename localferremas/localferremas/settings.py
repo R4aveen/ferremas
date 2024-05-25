@@ -39,7 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'ferremas.apps.FerremasConfig',
-    'carrito.apps.CarritoConfig',
+    'payment',
     'rest_framework',
 
 ]

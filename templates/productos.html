@@ -42,10 +42,10 @@
             {% for producto in page_obj %}
             <div class="col-md-4 mb-4">
                 <div class="card mx-4" style="width: 20rem;">
-                    <img src="{{ producto.imagen.url }}" class="card-img-top">
+                    <img src="{{ producto.imagen }}" class="card-img-top">
                     <div class="card-body">
                         <h5 class="card-title" style="text-align: center;">{{ producto.nombre }}</h5>
-                        <p class="card-text" style="color: black; text-align: center;">Precio${{ producto.precio }}</p>
+                        <p class="card-text" style="color: black; text-align: center;">Precio: ${{ producto.precio }}</p>
                         <p class="card-text" style="color: black; text-align: center;">Stock: {{ producto.stock }}</p>
                         <a href="{% url 'AGREGAR_AL_CARRITO' producto.id %}" class="btn btn btn-producto">Añadir al carrito</a>
                     </div>
@@ -129,39 +129,39 @@
 <script>
     // Función para ordenar los precios de mayor a menor
     function ordenarPreciosMayorMenor() {
-        var listaPrecios = document.querySelectorAll('.card-text');
-        var listaProductos = Array.from(listaPrecios).map(function(precio) {
-            return {
-                precio: parseFloat(precio.textContent.replace('$', '')),
-                elemento: precio.parentNode.parentNode.parentNode
-            };
+        var productos = document.querySelectorAll('#product-list .card');
+        var productosArray = Array.from(productos);
+        
+        productosArray.sort(function(a, b) {
+            var precioA = parseFloat(a.querySelector('.card-text').textContent.replace('Precio: $', '').replace(',', ''));
+            var precioB = parseFloat(b.querySelector('.card-text').textContent.replace('Precio: $', '').replace(',', ''));
+            return precioB - precioA;
         });
-        listaProductos.sort(function(a, b) {
-            return b.precio - a.precio;
-        });
+
         var productContainer = document.getElementById('product-list');
         productContainer.innerHTML = '';
-        listaProductos.forEach(function(item) {
-            productContainer.appendChild(item.elemento);
+        
+        productosArray.forEach(function(item) {
+            productContainer.appendChild(item);
         });
     }
 
     // Función para ordenar los precios de menor a mayor
     function ordenarPreciosMenorMayor() {
-        var listaPrecios = document.querySelectorAll('.card-text');
-        var listaProductos = Array.from(listaPrecios).map(function(precio) {
-            return {
-                precio: parseFloat(precio.textContent.replace('$', '')),
-                elemento: precio.parentNode.parentNode.parentNode
-            };
+        var productos = document.querySelectorAll('#product-list .card');
+        var productosArray = Array.from(productos);
+        
+        productosArray.sort(function(a, b) {
+            var precioA = parseFloat(a.querySelector('.card-text').textContent.replace('Precio: $', '').replace(',', ''));
+            var precioB = parseFloat(b.querySelector('.card-text').textContent.replace('Precio: $', '').replace(',', ''));
+            return precioA - precioB;
         });
-        listaProductos.sort(function(a, b) {
-            return a.precio - b.precio;
-        });
+
         var productContainer = document.getElementById('product-list');
         productContainer.innerHTML = '';
-        listaProductos.forEach(function(item) {
-            productContainer.appendChild(item.elemento);
+        
+        productosArray.forEach(function(item) {
+            productContainer.appendChild(item);
         });
     }
 
@@ -178,5 +178,7 @@
         }
     });
 </script>
+
+
 
 {% endblock contenido %}

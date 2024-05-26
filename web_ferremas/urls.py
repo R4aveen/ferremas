@@ -3,13 +3,13 @@ from .views import *
 from rest_framework import routers
 
 router = routers.DefaultRouter()
-router.register('Tipos de producto', TipoProductoViewset)
-router.register('Categoria de producto', CategoriaProductoViewset)
+router.register('tipos_producto', TipoProductoViewset)
+router.register('categorias_producto', CategoriaProductoViewset)
 router.register('productos', ProductoViewset)
-router.register('Producto en oferta', ProductoOfertaViewset)
-router.register('Carrito de compras', CarritoViewset)
-router.register('Boletas', BoletaViewset)
-router.register('Detalles de boletas', DetalleBoletaViewset)
+router.register('producto_oferta', ProductoOfertaViewset)
+router.register('carrito_compras', CarritoViewset)
+router.register('boletas', BoletaViewset)
+router.register('detalles_boletas', DetalleBoletaViewset)
 
 urlpatterns = [
     path('base/', base, name='BASE'),

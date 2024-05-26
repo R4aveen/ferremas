@@ -377,24 +377,34 @@ def registro(request):
     return render(request, 'registro.html')
 
 def productos(request):
-    productos = Producto.objects.all()
+    response_productos = requests.get('http://127.0.0.1:8000/api/productos/')
+    response_categorias = requests.get('http://127.0.0.1:8000/api/categorias_producto/')
+    response_tipos = requests.get('http://127.0.0.1:8000/api/tipos_producto/')
+    response_productos_oferta = requests.get('http://127.0.0.1:8000/api/producto_oferta/')
 
-    categorias_list = CategoriaProducto.objects.all()
+    data_productos = response_productos.json()
+    data_categorias = response_categorias.json()
+    data_tipos = response_tipos.json()
+    data_productos_oferta = response_productos_oferta.json()
 
-    tipos_list = TipoProducto.objects.all()
+    listado_productos = data_productos
+    listado_categorias = data_categorias
+    listado_tipos = data_tipos
+    listado_productos_oferta = data_productos_oferta
 
-    ofertas = ProductoOferta.objects.all()
-    paginator = Paginator(productos, 6) 
+
+
+    paginator = Paginator(listado_productos, 6) 
 
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
 
     ctx = {
         "page_obj": page_obj,
-        "productos" : productos,
-        "categorias": categorias_list,
-        "ofertas" : ofertas,
-        "tipos": tipos_list,
+        "productos" : listado_productos,
+        "categorias": listado_categorias,
+        "ofertas" : listado_productos_oferta,
+        "tipos": listado_tipos,
 
     }
     return render(request, 'productos.html', ctx)

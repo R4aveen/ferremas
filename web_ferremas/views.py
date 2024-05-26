@@ -16,7 +16,7 @@ from django.core.mail import send_mail
 from django.urls import reverse
 from django.utils.html import format_html
 from django.contrib.sites.shortcuts import get_current_site
-
+from django.db.models import Q
 
 
 # VISTA VENDEDOR
@@ -66,6 +66,7 @@ def aprobar_pedido(request, pedido_id):
     messages.success(request, 'El pedido ha sido aprobado y el cliente ha sido notificado.')
     return redirect('GESTIONAR_PEDIDOS')
 
+
 @login_required
 def rechazar_pedido(request, pedido_id):
     pedido = Pedido.objects.get(pk=pedido_id)
@@ -86,6 +87,7 @@ def rechazar_pedido(request, pedido_id):
     
     messages.success(request, 'El pedido ha sido rechazado, el cliente ha sido notificado y el pedido ha sido eliminado.')
     return redirect('GESTIONAR_PEDIDOS')
+
 
 @login_required
 @user_passes_test(es_vendedor)
@@ -123,6 +125,7 @@ def realizar_pedido(request):
         carrito.save()
     
     return redirect('CARRITO')
+
 
 
 
@@ -301,7 +304,7 @@ def login(request):
             elif user.groups.filter(name='vendedor').exists():
                 return redirect(to="ver_productos")
             elif user.groups.filter(name='bodeguero').exists():
-                return redirect(to="bodeguero")
+                return redirect(to="ver_pedidos")
             elif user.groups.filter(name='contador').exists():
                 return redirect(to="contador")
             return redirect(to="INDEX")
@@ -539,5 +542,96 @@ def generar_boleta(request):
     carrito.carritoitem_set.all().delete()
     carrito.pedido_aprobado = False
     carrito.save()
-    
+
+    # Notificar al cliente sobre el estado del pedido
+    send_mail(
+        'Pedido Completado',
+        'Tu pedido ha sido pagado y está en preparación.',
+        'pardodev78@gmail.com',
+        [request.user.email],
+        fail_silently=False,
+    )
+
     return redirect('CARRITO')
+
+# Bodeguero
+
+def es_bodeguero(user):
+    return user.groups.filter(name='bodeguero').exists()
+
+
+@login_required
+@user_passes_test(es_bodeguero)
+def ver_pedidos(request):
+    pedidos = Pedido.objects.filter(Q(estado='aprobado') | Q(estado='preparando'))
+    return render(request, 'trabajadores/bodeguero/ver_pedidos.html', {'pedidos': pedidos})
+
+@login_required
+@user_passes_test(es_bodeguero)
+def aceptar_pedido(request, pedido_id):
+    pedido = get_object_or_404(Pedido, pk=pedido_id)
+    pedido.estado = 'preparando'
+    pedido.save()
+
+    # Notificar al cliente que el pedido está en preparación
+    send_mail(
+        'Pedido en Preparación',
+        f'Tu pedido con ID {pedido.id} está siendo preparado.',
+        'pardodev78@gmail.com',  # Cambia esto por tu dirección de correo
+        [pedido.usuario.email],
+        fail_silently=False,
+    )
+
+    messages.success(request, 'El pedido está en preparación.')
+    return redirect('ver_pedidos')
+
+@login_required
+@user_passes_test(es_bodeguero)
+def entregar_pedido(request, pedido_id):
+    pedido = get_object_or_404(Pedido, pk=pedido_id)
+    pedido.estado = 'enviado'
+    pedido.save()
+
+    # Notificar al cliente que el pedido ha sido enviado
+    send_mail(
+        'Pedido Enviado',
+        f'Tu pedido con ID {pedido.id} ha sido enviado.',
+        'pardodev78@gmail.com',  # Cambia esto por tu dirección de correo
+        [pedido.usuario.email],
+        fail_silently=False,
+    )
+
+    messages.success(request, 'El pedido ha sido enviado.')
+    return redirect('ver_pedidos')
+
+
+
+# Despachador
+def es_despachador(user):
+    return user.groups.filter(name='despachador').exists()
+
+@login_required
+@user_passes_test(es_despachador)
+def ver_pedidos_despachador(request):
+    pedidos = Pedido.objects.filter(estado='enviado')
+    return render(request, 'trabajadores/despachador/ver_pedidos.html', {'pedidos': pedidos})
+
+
+@login_required
+@user_passes_test(es_despachador)
+def entregar_pedido_despachador(request, pedido_id):
+    pedido = get_object_or_404(Pedido, pk=pedido_id)
+    pedido.estado = 'entregado'
+    pedido.save()
+
+    # Notificar al cliente que el pedido ha sido entregado
+    send_mail(
+        'Pedido Entregado',
+        f'Tu pedido con ID {pedido.id} ha sido entregado.',
+        'pardodev78@gmail.com',  # Cambia esto por tu dirección de correo
+        [pedido.usuario.email],
+        fail_silently=False,
+    )
+
+    messages.success(request, 'El pedido ha sido entregado.')
+    return redirect('ver_pedidos_despachador')

@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+{% block contenido %}
+<h1>Pedidos Enviados</h1>
+<table class="styled-table">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Usuario</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for pedido in pedidos %}
+        <tr>
+            <td>{{ pedido.id }}</td>
+            <td>{{ pedido.usuario.username }}</td>
+            <td>{{ pedido.estado }}</td>
+            <td>
+                <a href="{% url 'entregar_pedido_despachador' pedido.id %}" class="btn">Marcar como Entregado</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<style>
+    .styled-table {
+    border-collapse: collapse;
+    width: 100%;
+    margin-top: 20px;
+    font-size: 0.9em;
+    font-family: 'Arial', sans-serif;
+    color: #333;
+}
+.styled-table thead tr {
+    background-color: #009879;
+    color: #ffffff;
+    text-align: left;
+}
+.styled-table th, .styled-table td {
+    padding: 12px 15px;
+    border: 1px solid #ddd;
+    text-align: center;
+}
+.styled-table tbody tr {
+    border-bottom: 1px solid #dddddd;
+}
+.styled-table tbody tr:nth-of-type(even) {
+    background-color: #f3f3f3;
+}
+.styled-table tbody tr:last-of-type {
+    border-bottom: 2px solid #009879;
+}
+.styled-table tbody tr:hover {
+    background-color: #f1f1f1;
+}
+.btn {
+    background-color: #009879;
+    color: white;
+    padding: 5px 10px;
+    text-decoration: none;
+    border-radius: 5px;
+}
+.btn:hover {
+    background-color: #007b5e;
+}
+
+</style>
+{% endblock %}

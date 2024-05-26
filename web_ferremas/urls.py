@@ -63,4 +63,16 @@ urlpatterns = [
     path('gestionar_pedidos/', gestionar_pedidos, name='GESTIONAR_PEDIDOS'),
     path('generar_boleta/', generar_boleta, name='GENERAR_BOLETA'),
     path('anular_pedido/<int:pedido_id>/', anular_pedido, name='ANULAR_PEDIDO'),
+
+
+    # BODEGUERO
+    path('ver_pedidos/', ver_pedidos, name='ver_pedidos'),
+    path('aceptar_pedido/<int:pedido_id>/', aceptar_pedido, name='aceptar_pedido'),
+    path('entregar_pedido/<int:pedido_id>/', entregar_pedido, name='entregar_pedido'),
+    path('aprobar_pedido/<int:pedido_id>/', aprobar_pedido, name='aprobar_pedido'),
+    path('rechazar_pedido/<int:pedido_id>/', rechazar_pedido, name='rechazar_pedido'),
+
+    # DESPACHADOR
+    path('ver_pedidos_despachador/', ver_pedidos_despachador, name='ver_pedidos_despachador'),
+    path('entregar_pedido_despachador/<int:pedido_id>/', entregar_pedido_despachador, name='entregar_pedido_despachador'),
 ]

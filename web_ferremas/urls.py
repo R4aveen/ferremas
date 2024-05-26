@@ -1,5 +1,15 @@
 from django.urls import path, include
 from .views import *
+from rest_framework import routers
+
+router = routers.DefaultRouter()
+router.register('Tipos de producto', TipoProductoViewset)
+router.register('Categoria de producto', CategoriaProductoViewset)
+router.register('productos', ProductoViewset)
+router.register('Producto en oferta', ProductoOfertaViewset)
+router.register('Carrito de compras', CarritoViewset)
+router.register('Boletas', BoletaViewset)
+router.register('Detalles de boletas', DetalleBoletaViewset)
 
 urlpatterns = [
     path('base/', base, name='BASE'),
@@ -12,6 +22,9 @@ urlpatterns = [
     path('perfil/actualizar/', actualizar_perfil, name='actualizar_perfil'),
     # path('crud_productos/', crud_productos, name='CRUD_PRODUCTOS'),
     #
+
+    path('api/', include(router.urls)),
+
     path('categoriaprod/<int:categoriaprod_id>/', categoriaprod, name="categoriaprod"),
     path('tipoprod/<int:tipoprod_id>/', tipoprod, name="tipoprod"),
 

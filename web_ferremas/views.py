@@ -17,6 +17,41 @@ from django.urls import reverse
 from django.utils.html import format_html
 from django.contrib.sites.shortcuts import get_current_site
 from django.db.models import Q
+from .serializers import *
+import requests
+from rest_framework import viewsets, status
+
+
+# VIEWSETS
+class TipoProductoViewset(viewsets.ModelViewSet):
+    queryset = TipoProducto.objects.all()
+    serializer_class = TipoProductoSerializer
+
+class CategoriaProductoViewset(viewsets.ModelViewSet):
+    queryset = CategoriaProducto.objects.all()
+    serializer_class = CategoriaProductoSerializer
+
+class ProductoViewset(viewsets.ModelViewSet):
+    queryset = Producto.objects.all()
+    serializer_class = ProductoSerializer
+
+class ProductoOfertaViewset(viewsets.ModelViewSet):
+    queryset = ProductoOferta.objects.all()
+    serializer_class = ProductoOfertaSerializer
+
+class CarritoViewset(viewsets.ModelViewSet):
+    queryset = Carrito.objects.all()
+    serializer_class = CarritoSerializer
+
+class BoletaViewset(viewsets.ModelViewSet):
+    queryset = Boleta.objects.all()
+    serializer_class = BoletaSerializer
+
+class DetalleBoletaViewset(viewsets.ModelViewSet):
+    queryset = DetalleBoleta.objects.all()
+    serializer_class = DetalleBoletaSerializer
+
+
 
 
 # VISTA VENDEDOR

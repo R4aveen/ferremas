@@ -39,7 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'web_ferremas',
-    'transbank'
+    'transbank',
+    'rest_framework',
 ]
 
 MIDDLEWARE = [

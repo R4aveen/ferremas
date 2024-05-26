@@ -10,6 +10,7 @@ router.register('producto_oferta', ProductoOfertaViewset)
 router.register('carrito_compras', CarritoViewset)
 router.register('boletas', BoletaViewset)
 router.register('detalles_boletas', DetalleBoletaViewset)
+router.register('pedidos', PedidoViewset)
 
 urlpatterns = [
     path('base/', base, name='BASE'),
@@ -24,6 +25,9 @@ urlpatterns = [
     #
 
     path('api/', include(router.urls)),
+    path('api/carrito_compras/<int:user_id>/', carrito_usuario, name='carrito_usuario'),
+    path('api/carrito_items/<int:user_id>/', carrito_items_usuario, name='carrito_items_usuario'),
+    path('api/pedidos/<int:user_id>/', pedido_usuario, name='pedido_usuario'),
 
     path('categoriaprod/<int:categoriaprod_id>/', categoriaprod, name="categoriaprod"),
     path('tipoprod/<int:tipoprod_id>/', tipoprod, name="tipoprod"),

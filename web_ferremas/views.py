@@ -20,7 +20,8 @@ from django.db.models import Q
 from .serializers import *
 import requests
 from rest_framework import viewsets, status
-
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
 
 # VIEWSETS
 class TipoProductoViewset(viewsets.ModelViewSet):
@@ -50,6 +51,30 @@ class BoletaViewset(viewsets.ModelViewSet):
 class DetalleBoletaViewset(viewsets.ModelViewSet):
     queryset = DetalleBoleta.objects.all()
     serializer_class = DetalleBoletaSerializer
+
+class PedidoViewset(viewsets.ModelViewSet):
+    queryset = Pedido.objects.all()
+    serializer_class = PedidoSerializer
+
+@api_view(['GET'])
+def carrito_usuario(request, user_id):
+    carrito = Carrito.objects.get(usuario_id=user_id)
+    serializer = CarritoSerializer(carrito)
+    return Response(serializer.data)
+
+@api_view(['GET'])
+def carrito_items_usuario(request, user_id):
+    carrito = Carrito.objects.get(usuario_id=user_id)
+    items = CarritoItem.objects.filter(carrito=carrito)
+    serializer = CarritoItemSerializer(items, many=True)
+    return Response(serializer.data)
+
+@api_view(['GET'])
+def pedido_usuario(request, user_id):
+    carrito = Carrito.objects.get(usuario_id=user_id)
+    pedido = Pedido.objects.filter(carrito=carrito).first()
+    serializer = PedidoSerializer(pedido)
+    return Response(serializer.data)
 
 
 
@@ -458,6 +483,11 @@ def tipoprod(request, tipoprod_id):
 ### carrito
 @login_required(login_url='/login/')
 def carrito(request):
+    response_carrito = requests.get('http://127.0.0.1:8000/api/carrito_compras/')
+
+    data_carrito = response_carrito.json()
+    carritos = data_carrito
+
     carrito = Carrito.objects.get(usuario=request.user)
     items_carrito = CarritoItem.objects.filter(carrito=carrito)
     total = sum(item.precio_total() for item in items_carrito)

@@ -46,3 +46,8 @@ class DetalleBoletaSerializer(serializers.ModelSerializer):
         model = DetalleBoleta
         fields = '__all__'     
 
+class PedidoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Pedido
+        fields = '__all__'     
+

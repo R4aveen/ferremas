@@ -39,18 +39,24 @@
             </div>
         </nav>
         <section id="product-list" class="row">
-            {% for producto in page_obj %}
-            <div class="col-md-4 mb-4">
-                <div class="card mx-4" style="width: 20rem;">
-                    <img src="{{ producto.imagen.url }}" class="card-img-top">
-                    <div class="card-body">
-                        <h5 class="card-title" style="text-align: center;">{{ producto.nombre }}</h5>
-                        <p class="card-text" style="color: black; text-align: center;">${{ producto.precio }}</p>
-                        <a href="{% url 'AGREGAR_AL_CARRITO' producto.id %}" class="btn btn btn-producto">Añadir al carrito</a>
-                    </div>
-                </div>
-            </div>
-            {% endfor %}
+            <table>
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th>Descripción</th>
+                    <th>Stock</th>
+                    <th>Precio unitario</th>
+                </tr>
+                {% for producto in page_obj %}
+                <tr>
+                    <td>{{ producto.id }}</td>
+                    <td>{{ producto.nombre }}</td>
+                    <td>{{ producto.descripcion }}</td>
+                    <td>{{ producto.stock }}</td>
+                    <td>$ {{ producto.precio }}</td>
+                </tr>
+                {% endfor %}
+            </table>
         </section>
         <footer class="text-center my-4">
             <nav>
@@ -123,6 +129,29 @@
             letter-spacing: 4px;
             color: white;
             border-radius: 25px;
+    }
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+    }
+
+    th, td {
+        border: 1px solid #dddddd;
+        text-align: left;
+        padding: 8px;
+    }
+
+    th {
+        background-color: #f2f2f2;
+    }
+
+    tr {
+        background-color: #ddd;
+        
+    }
+    tr:hover {
+        background-color: #bdbdbd;
     }
 </style>
 <script>

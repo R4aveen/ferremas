@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+
+{% block contenido %}
+<h2 class="titulo-productos">Productos Disponibles</h2>
+<div class="tabla-productos-container">
+    <table class="tabla-productos">
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Precio</th>
+                <th>Stock</th>
+                <th>Descripción</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for producto in productos %}
+            <tr>
+                <td>{{ producto.nombre }}</td>
+                <td>${{ producto.precio }}</td>
+                <td>{{ producto.stock }}</td>
+                <td>{{ producto.descripcion }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<style>
+    body {
+    font-family: Arial, sans-serif;
+    color: #333;
+}
+
+.titulo-productos {
+    text-align: center;
+    font-size: 2rem;
+    margin: 2rem 0;
+}
+
+.tabla-productos-container {
+    margin: 0 auto;
+    max-width: 80%;
+    background: rgba(255, 255, 255, 0.9);
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.tabla-productos {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.tabla-productos th, .tabla-productos td {
+    border: 1px solid #ddd;
+    padding: 0.8rem;
+    text-align: left;
+}
+
+.tabla-productos th {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.tabla-productos tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+.tabla-productos tr:hover {
+    background-color: #ddd;
+}
+
+</style>
+{% endblock %}

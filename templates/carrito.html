@@ -2,12 +2,73 @@
 {% load static %}
 
 {% block css %}
-
+<style>
+    * {
+        color: white;
+    }
+    table {
+        border-collapse: collapse;
+        width: 100%;
+        margin-top: 2rem;
+    }
+    th {
+        border: 1px solid black;
+        padding: 0.5rem;
+        text-align: center;
+        color: white;
+    }
+    td {
+        border: 1px solid black;
+        padding: 0.5rem;
+        text-align: center;
+        color: black;
+    }
+    .row-top {
+        background-color: black;
+        color: white;
+    }
+    .row-content {
+        background-color: white;
+    }
+    .row-content:nth-child(even) {
+        background-color: lightgray;
+    }
+    .btn {
+        background-color: red;
+        color: white;
+        padding: 0.3rem 0.5rem;
+        text-decoration: none;
+        border: none;
+    }
+    .btn:hover {
+        background-color: darkred;
+    }
+    .row-bottom {
+        background-color: black;
+    }
+    .row-bottom td {
+        color: white;
+    }
+    .btn.disabled {
+        background-color: gray;
+        cursor: not-allowed;
+    }
+</style>
 {% endblock css %}
 
 {% block contenido %}
 <div class="container" style="height: 35rem;">
     <h1 class="mt-5">Carrito de Compras</h1>
+    
+    {% if messages %}
+    <div>
+        {% for message in messages %}
+        <div class="alert alert-info">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
     
     {% if items_carrito %}
     <table>
@@ -45,62 +106,19 @@
         </tr>
     </table>
     <a href="{% url 'VACIAR_CARRITO' %}" class="btn btn-danger mt-3">VACIAR CARRITO</a>
-    <a href="{% url 'generar_boleta' %}" class="btn btn-success mt-3">Proceder al Pago</a>
+    {% if not pedido_aprobado %}
+    <a href="{% url 'REALIZAR_PEDIDO' %}" class="btn btn-primary mt-3">Realizar Pedido</a>
+    {% if pedido %}
+    <a href="{% url 'ANULAR_PEDIDO' pedido.id %}" class="btn btn-warning mt-3">Anular Pedido</a>
+    {% endif %}
+    {% else %}
+    <a href="{% url 'generar_boleta_webpay' %}" class="btn btn-success mt-3">Proceder al Pago</a>
+    {% endif %}
     {% else %}
     <div style="background-color: rgba(245, 245, 245, 0.849); border: solid 2px black; padding: 2rem 2rem;
                 border-radius: 3rem;">
-        <h3 style="color: red;">El carrito está vacío( Añade productos :D)</h3>
+        <h3 style="color: red;">El carrito está vacío (Añade productos :D)</h3>
     </div>
     {% endif %}
 </div>
-
-<style>
-    /* DISEÑO QLIAO BUENO QUE HIZO EL CHATGPT */
-    * {
-        color: white; /* Cambiado a negro para que sea legible sobre el fondo blanco */
-    }
-    table {
-        border-collapse: collapse; /* Colapso de bordes para un aspecto más limpio */
-        width: 100%;
-        margin-top: 2rem; /* Agregado espacio en la parte superior */
-    }
-    th{
-        border: 1px solid black; /* Bordes de 1px sólido */
-        padding: 0.5rem; /* Reducido el relleno */
-        text-align: center; /* Alineación centrada */
-        color: white;
-    }
-    td {
-        border: 1px solid black; /* Bordes de 1px sólido */
-        padding: 0.5rem; /* Reducido el relleno */
-        text-align: center; /* Alineación centrada */
-        color: black;
-    }
-    .row-top {
-        background-color: black; /* Cambiado el color de fondo */
-        color: white; /* Texto en blanco para mayor contraste */
-    }
-    .row-content{
-        background-color: white;
-    }
-    .row-content:nth-child(even) {
-        background-color: lightgray; /* Fondo alternativo para mejorar la legibilidad */
-    }
-    .btn {
-        background-color: red; /* Cambiado el color de fondo del botón */
-        color: white; /* Texto en blanco para mayor contraste */
-        padding: 0.3rem 0.5rem; /* Ajuste del relleno */
-        text-decoration: none; /* Eliminado el subrayado del botón */
-        border: none; /* Eliminado el borde del botón */
-    }
-    .btn:hover {
-        background-color: darkred; /* Color de fondo cambiado al pasar el ratón */
-    }
-    .row-bottom{
-        background-color: black;
-    }
-    .row-bottom td{
-        color: white;
-    }
-</style>
 {% endblock contenido %}

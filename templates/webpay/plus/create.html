@@ -1,19 +1,64 @@
-<!-- webpay/plus/create.html -->
-
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Webpay Plus Create</title>
+    <title>Redirección a Webpay Plus</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #8a2be2; /* Fondo morado agradable */
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            text-align: center;
+            background-color: #ffffff;
+            border-radius: 8px;
+            padding: 40px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #333333;
+            margin-bottom: 20px;
+        }
+
+        p {
+            color: #666666;
+            margin-bottom: 20px;
+        }
+
+        button {
+            background-color: #4b0082; /* Morado más oscuro para el botón */
+            color: #ffffff;
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #6a5acd; /* Cambio de color al pasar el cursor */
+        }
+    </style>
 </head>
 <body>
-    <h1>Redirigiendo a Webpay Plus...</h1>
-    <form action="{{ response.url }}" method="POST" id="webpay-form">
-        <input type="hidden" name="token_ws" value="{{ response.token }}">
-        <noscript>
-            <p>JavaScript is disabled. Click the button below to proceed.</p>
-            <button type="submit">Proceed</button>
-        </noscript>
-    </form>
+    <div class="container">
+        <h1>Redirección a Webpay Plus...</h1>
+        <form action="{{ response.url }}" method="POST" id="webpay-form">
+            <input type="hidden" name="token_ws" value="{{ response.token }}">
+            <noscript>
+                <p>JavaScript está deshabilitado. Haz clic en el botón de abajo para continuar.</p>
+                <button type="submit">Continuar</button>
+            </noscript>
+        </form>
+    </div>
     <script>
         document.getElementById('webpay-form').submit();
     </script>

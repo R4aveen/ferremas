@@ -8,7 +8,9 @@ urlpatterns = [
     path('cerrar_sesion/', cerrar_sesion, name='CERRAR_SESION'),
     path('registro/', registro, name='REGISTRO'),
     path('productos/', productos, name='PRODUCTOS'),
-    path('crud_productos/', crud_productos, name='CRUD_PRODUCTOS'),
+    path('perfil/', perfil_usuario, name='PERFIL_USUARIO'),
+    path('perfil/actualizar/', actualizar_perfil, name='actualizar_perfil'),
+    # path('crud_productos/', crud_productos, name='CRUD_PRODUCTOS'),
     #
     path('categoriaprod/<int:categoriaprod_id>/', categoriaprod, name="categoriaprod"),
     path('tipoprod/<int:tipoprod_id>/', tipoprod, name="tipoprod"),
@@ -39,11 +41,26 @@ urlpatterns = [
     path('webpay-plus/refund-form', webpay_plus_refund_form, name='webpay_plus_refund_form'),
     path('webpay-plus/status-form', show_create, name='webpay_plus_status_form'),
     path('webpay-plus/status', status, name='webpay_plus_status'),
-    path('generar-boleta/', generarBoleta, name='generar_boleta'),
+    path('generar-boleta_webpay/', generarBoleta, name='generar_boleta_webpay'),
 
 
     # Trabajadores
-    path('vendedor/', vendedor, name='vendedor'),
-    path('categoria/<int:categoria_id>/', categoria, name="categoria"),
-    path('tipo/<int:tipo_id>/', tipo, name="tipo"),
+    # path('vendedor/', vendedor, name='vendedor'),
+    # path('categoria/<int:categoria_id>/', categoria, name="categoria"),
+    # path('tipo/<int:tipo_id>/', tipo, name="tipo"),
+    # path('bodeguero/', bodeguero, name="bodeguero"),
+    # path('contador/', contador, name="contador"),
+
+    # Vistas vendedor
+
+    path('ver_productos/', ver_productos, name='ver_productos'),
+    path('enviar_orden/<int:pedido_id>/', enviar_orden, name='enviar_orden'),
+
+
+    path('realizar_pedido/', realizar_pedido, name='REALIZAR_PEDIDO'),
+    path('aprobar_pedido/<int:pedido_id>/', aprobar_pedido, name='APROBAR_PEDIDO'),
+    path('rechazar_pedido/<int:pedido_id>/', rechazar_pedido, name='RECHAZAR_PEDIDO'),
+    path('gestionar_pedidos/', gestionar_pedidos, name='GESTIONAR_PEDIDOS'),
+    path('generar_boleta/', generar_boleta, name='GENERAR_BOLETA'),
+    path('anular_pedido/<int:pedido_id>/', anular_pedido, name='ANULAR_PEDIDO'),
 ]

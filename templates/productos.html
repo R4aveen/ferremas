@@ -45,7 +45,8 @@
                     <img src="{{ producto.imagen.url }}" class="card-img-top">
                     <div class="card-body">
                         <h5 class="card-title" style="text-align: center;">{{ producto.nombre }}</h5>
-                        <p class="card-text" style="color: black; text-align: center;">${{ producto.precio }}</p>
+                        <p class="card-text" style="color: black; text-align: center;">Precio${{ producto.precio }}</p>
+                        <p class="card-text" style="color: black; text-align: center;">Stock: {{ producto.stock }}</p>
                         <a href="{% url 'AGREGAR_AL_CARRITO' producto.id %}" class="btn btn btn-producto">Añadir al carrito</a>
                     </div>
                 </div>

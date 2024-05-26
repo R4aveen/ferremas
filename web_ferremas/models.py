@@ -41,6 +41,7 @@ class ProductoOferta(models.Model):
 class Carrito(models.Model):
     usuario = models.ForeignKey(User, on_delete=models.CASCADE)
     creado_en = models.DateTimeField(default=timezone.now)
+    pedido_aprobado = models.BooleanField(default=False)
 
     def __str__(self):
         return f"{self.usuario} - {self.creado_en}"
@@ -54,7 +55,41 @@ class CarritoItem(models.Model):
     def precio_total(self):
         return self.cantidad * self.precio
     
+class Pedido(models.Model):
+    ESTADO_PEDIDO = [
+        ('pendiente', 'Pendiente'),
+        ('aprobado', 'Aprobado'),
+        ('preparando', 'Preparando'),
+        ('enviado', 'Enviado'),
+        ('entregado', 'Entregado'),
+        ('cancelado', 'Cancelado'),
+    ]
+    usuario = models.ForeignKey(User, on_delete=models.CASCADE)
+    carrito = models.OneToOneField(Carrito, on_delete=models.CASCADE)
+    estado = models.CharField(max_length=10, choices=ESTADO_PEDIDO, default='pendiente')
+    creado_en = models.DateTimeField(default=timezone.now)
+    actualizado_en = models.DateTimeField(auto_now=True)
+    direccion_envio = models.CharField(max_length=255, null=True, blank=True)
+    metodo_pago = models.CharField(max_length=50, null=True, blank=True)
+
+    def __str__(self):
+        return f"Pedido {self.id} - {self.usuario} - {self.estado}"
+
+# DetallePedido (Existing model)
+class DetallePedido(models.Model):
+    pedido = models.ForeignKey(Pedido, on_delete=models.CASCADE)
+    producto = models.ForeignKey(Producto, on_delete=models.CASCADE)
+    cantidad = models.PositiveIntegerField()
+    precio = models.DecimalField(max_digits=10, decimal_places=2)
+    subtotal = models.DecimalField(max_digits=10, decimal_places=2)
+
+    def __str__(self):
+        return f"Pedido {self.pedido.id} - Producto {self.producto.nombre} - Cantidad {self.cantidad}"
+
+
+
 class Boleta(models.Model):
+    usuario = models.ForeignKey(User, on_delete=models.CASCADE, default=1)
     total = models.PositiveIntegerField()
     fecha = models.DateTimeField(auto_now_add=True)
 
@@ -64,5 +99,3 @@ class DetalleBoleta(models.Model):
     cantidad = models.PositiveIntegerField()
     subtotal = models.PositiveIntegerField()
     
-# COMUNA
-# CIUDAD

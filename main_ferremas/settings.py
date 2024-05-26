@@ -135,3 +135,11 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 WEBPAY_PLUS_COMMERCE_CODE = '597055555532'  # Código de comercio de prueba
 WEBPAY_PLUS_API_KEY = 'b89576d6b4c1e2f1f1d3dbd23a75c3af'  # Clave API de prueba
 WEBPAY_PLUS_ENVIRONMENT = 'TEST'
+
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'  # O el servidor SMTP que estés usando
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'pardodev78@gmail.com'
+EMAIL_HOST_PASSWORD = 'yaor bbpi nyig ohsx'

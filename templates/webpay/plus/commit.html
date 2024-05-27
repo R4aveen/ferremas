@@ -3,20 +3,91 @@
 <head>
     <meta charset="UTF-8">
     <title>Resultado de Transacción</title>
+    <style>
+        body {
+            background-color: #6a1b9a; /* Fondo morado agradable */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        h1 {
+            color: #333;
+        }
+        h2 {
+            color: #555;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+        th {
+            background-color: #333;
+            color: #fff;
+        }
+        tfoot td {
+            font-weight: bold;
+        }
+        a {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #333;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+        a:hover {
+            background-color: #555;
+        }
+    </style>
 </head>
 <body>
-    <h1>Resultado de Transacción</h1>
-    <p>Status: {{ response.status }}</p>
-
-    <p>Total: {{ total }}</p>
-    <h2>Productos:</h2>
-    <ul>
-        {% for producto in productos %}
-        <li>{{ producto.nombre }} CANTIDAD: {{ producto.cantidad }} SUBTOTAL: {{ producto.subtotal }}</li>
-        {% endfor %}
-    </ul>
-
-    <a href="{% url 'CARRITO' %}">Volver a Carrito</a>
-
+    <div class="container">
+        <h1>Resultado de Transacción</h1>
+        <p>Status: {{ response.status }}</p>
+        <p>Total: {{ total }}</p>
+        <h2>Productos:</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Producto</th>
+                    <th>Cantidad</th>
+                    <th>Subtotal</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for producto in productos %}
+                <tr>
+                    <td>{{ producto.nombre }}</td>
+                    <td>{{ producto.cantidad }}</td>
+                    <td>{{ producto.subtotal }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="2">Total</td>
+                    <td>{{ total }}</td>
+                </tr>
+            </tfoot>
+        </table>
+        <a href="{% url 'CARRITO' %}">Volver a Carrito</a>
+    </div>
 </body>
 </html>

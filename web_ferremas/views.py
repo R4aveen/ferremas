@@ -171,6 +171,8 @@ def realizar_pedido(request):
     pedido_existente = Pedido.objects.filter(carrito=carrito).exclude(estado__in=['cancelado', 'entregado']).first()
     
     if not pedido_existente:
+
+        direccion_envio = request.user.direccion if hasattr(request.user, 'direccion') else 'Dirección no proporcionada'
         # Crear un nuevo pedido si no existe uno pendiente o aprobado
         pedido = Pedido.objects.create(
             usuario=request.user,
@@ -361,7 +363,15 @@ def webpay_plus_create(request):
 
 # Create your views here.
 def base(request):
-    return render(request, 'base.html')
+    grupos_usuario = request.user.groups.values_list('name', flat=True)
+    ctx = {
+        'es_vendedor': 'vendedor' in grupos_usuario,
+        'es_contador': 'contador' in grupos_usuario,
+        'es_bodeguero': 'bodeguero' in grupos_usuario,
+        'es_despachador': 'despachador' in grupos_usuario,
+        'es_cliente': 'cliente' in grupos_usuario,
+    }
+    return render(request, 'base.html', ctx)
 
 
 
@@ -498,15 +508,17 @@ def tipoprod(request, tipoprod_id):
 @login_required(login_url='/login/')
 def carrito(request):
     response_carrito = requests.get('http://127.0.0.1:8000/api/carrito_compras/')
-
     data_carrito = response_carrito.json()
     carritos = data_carrito
 
-    carrito = Carrito.objects.get(usuario=request.user)
+    # Usar get_or_create para manejar el caso en que no existe un carrito
+    carrito, created = Carrito.objects.get_or_create(usuario=request.user)
+
     items_carrito = CarritoItem.objects.filter(carrito=carrito)
     total = sum(item.precio_total() for item in items_carrito)
     pedido = Pedido.objects.filter(carrito=carrito).first()
     pedido_aprobado = pedido and pedido.estado == 'aprobado'
+
     return render(request, 'carrito.html', {
         'items_carrito': items_carrito,
         'total_formato': total,
@@ -514,6 +526,7 @@ def carrito(request):
         'pedido_aprobado': pedido_aprobado,
         'pedido': pedido,
     })
+
 
 from django.contrib import messages
 

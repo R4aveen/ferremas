@@ -6,9 +6,17 @@
     </div>
     <ul class="menu" id="menu">
         {% if user.is_authenticated %}
-            {% if user.es_vendedor %}   
-                <li><a href="{% url 'VER_PRODUCTOS' %}" class="enlace">Ver Productos</a></li>
+            {%  if user.groups.first.name == "vendedor" %}   
+                <li><a href="{% url 'ver_productos' %}" class="enlace">Ver Productos</a></li>
                 <li><a href="{% url 'GESTIONAR_PEDIDOS' %}" class="enlace">Gestionar Pedidos</a></li>
+                <li><a href="{% url 'PERFIL_USUARIO' %}" class="enlace btn-ingresar">Mi Perfil</a></li>
+                <li><a href="{% url 'CERRAR_SESION' %}" class="enlace btn-cerrar">Cerrar Sesión</a></li>
+            {% elif user.groups.first.name == "bodeguero" %}
+                <li><a href="{% url 'ver_pedidos' %}" class="enlace">Ver Productos</a></li>
+                <li><a href="{% url 'PERFIL_USUARIO' %}" class="enlace btn-ingresar">Mi Perfil</a></li>
+                <li><a href="{% url 'CERRAR_SESION' %}" class="enlace btn-cerrar">Cerrar Sesión</a></li>
+            {% elif user.groups.first.name == "despachador" %}
+                <li><a href="{% url 'ver_pedidos_despachador' %}" class="enlace">Ver Productos</a></li>
                 <li><a href="{% url 'PERFIL_USUARIO' %}" class="enlace btn-ingresar">Mi Perfil</a></li>
                 <li><a href="{% url 'CERRAR_SESION' %}" class="enlace btn-cerrar">Cerrar Sesión</a></li>
             {% else %}

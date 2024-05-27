@@ -78,9 +78,16 @@ WSGI_APPLICATION = 'main_ferremas.wsgi.application'
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+    'default' : {
+    'ENGINE' : 'django.db.backends.mysql',
+    'NAME' :'myferremas',
+    'HOST' :'localhost',
+    'PORT' :'3306',
+    'USER' :'root',
+    'PASSWORD' :'',
+    'OPTIONS': {
+        'sql_mode': 'traditional',
+        }
     }
 }
 
@@ -107,7 +114,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'es-cl'
 
 TIME_ZONE = 'UTC'
 

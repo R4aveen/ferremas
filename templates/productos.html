@@ -11,7 +11,7 @@
         <header class="text-center my-4">
             <h1>Hola!!! (<span>{{ user.username }}</span>)</h1>
         </header>
-        <nav class="filters text-center mb-4">
+        <nav class="filters d-flex justify-content-center mb-4" >
             <div class="dropdown d-inline-block">
                 <button class="btn btn-primary dropdown-toggle mx-2" type="button" id="categoriaDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                     Categoría
@@ -42,11 +42,10 @@
             {% for producto in page_obj %}
             <div class="col-md-4 mb-4">
                 <div class="card mx-4" style="width: 20rem;">
-                    <img src="{{ producto.imagen }}" class="card-img-top">
+                    <img src="{{ producto.imagen.url }}" class="card-img-top">
                     <div class="card-body">
                         <h5 class="card-title" style="text-align: center;">{{ producto.nombre }}</h5>
-                        <p class="card-text" style="color: black; text-align: center;">Precio: ${{ producto.precio }}</p>
-                        <p class="card-text" style="color: black; text-align: center;">Stock: {{ producto.stock }}</p>
+                        <p class="card-text" style="color: black; text-align: center;">${{ producto.precio }}</p>
                         <a href="{% url 'AGREGAR_AL_CARRITO' producto.id %}" class="btn btn btn-producto">Añadir al carrito</a>
                     </div>
                 </div>
@@ -129,39 +128,39 @@
 <script>
     // Función para ordenar los precios de mayor a menor
     function ordenarPreciosMayorMenor() {
-        var productos = document.querySelectorAll('#product-list .card');
-        var productosArray = Array.from(productos);
-        
-        productosArray.sort(function(a, b) {
-            var precioA = parseFloat(a.querySelector('.card-text').textContent.replace('Precio: $', '').replace(',', ''));
-            var precioB = parseFloat(b.querySelector('.card-text').textContent.replace('Precio: $', '').replace(',', ''));
-            return precioB - precioA;
+        var listaPrecios = document.querySelectorAll('.card-text');
+        var listaProductos = Array.from(listaPrecios).map(function(precio) {
+            return {
+                precio: parseFloat(precio.textContent.replace('$', '')),
+                elemento: precio.parentNode.parentNode.parentNode
+            };
         });
-
+        listaProductos.sort(function(a, b) {
+            return b.precio - a.precio;
+        });
         var productContainer = document.getElementById('product-list');
         productContainer.innerHTML = '';
-        
-        productosArray.forEach(function(item) {
-            productContainer.appendChild(item);
+        listaProductos.forEach(function(item) {
+            productContainer.appendChild(item.elemento);
         });
     }
 
     // Función para ordenar los precios de menor a mayor
     function ordenarPreciosMenorMayor() {
-        var productos = document.querySelectorAll('#product-list .card');
-        var productosArray = Array.from(productos);
-        
-        productosArray.sort(function(a, b) {
-            var precioA = parseFloat(a.querySelector('.card-text').textContent.replace('Precio: $', '').replace(',', ''));
-            var precioB = parseFloat(b.querySelector('.card-text').textContent.replace('Precio: $', '').replace(',', ''));
-            return precioA - precioB;
+        var listaPrecios = document.querySelectorAll('.card-text');
+        var listaProductos = Array.from(listaPrecios).map(function(precio) {
+            return {
+                precio: parseFloat(precio.textContent.replace('$', '')),
+                elemento: precio.parentNode.parentNode.parentNode
+            };
         });
-
+        listaProductos.sort(function(a, b) {
+            return a.precio - b.precio;
+        });
         var productContainer = document.getElementById('product-list');
         productContainer.innerHTML = '';
-        
-        productosArray.forEach(function(item) {
-            productContainer.appendChild(item);
+        listaProductos.forEach(function(item) {
+            productContainer.appendChild(item.elemento);
         });
     }
 
@@ -178,7 +177,5 @@
         }
     });
 </script>
-
-
 
 {% endblock contenido %}

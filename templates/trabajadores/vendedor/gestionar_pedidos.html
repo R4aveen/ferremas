@@ -120,8 +120,12 @@
                 <td>{{ pedido.creado_en }}</td>
                 <td>{{ pedido.estado }}</td>
                 <td class="acciones">
-                    <a href="{% url 'APROBAR_PEDIDO' pedido.id %}" class="btn-aprobar">Aprobar</a>
-                    <a href="{% url 'RECHAZAR_PEDIDO' pedido.id %}" class="btn-rechazar">Rechazar</a>
+                    {% if pedido.estado == 'pendiente' %}
+                        <a href="{% url 'APROBAR_PEDIDO' pedido.id %}" class="btn-aprobar">Aprobar</a>
+                        <a href="{% url 'RECHAZAR_PEDIDO' pedido.id %}" class="btn-rechazar">Rechazar</a>
+                    {% elif pedido.estado == 'pendiente de pago' %}
+                        <a href="{% url 'RECHAZAR_PEDIDO' pedido.id %}" class="btn-rechazar">Rechazar</a>
+                    {% endif %}
                 </td>
             </tr>
             {% endfor %}

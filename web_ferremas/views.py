@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth import logout,authenticate,login as login_aut
+from django.contrib.auth import logout,authenticate,login as auth_login
 from django.contrib.auth.models import User
 from .models import CategoriaProducto, Producto, ProductoOferta, Carrito, CarritoItem, Boleta, DetalleBoleta, TipoProducto, Pedido, DetallePedido
 from django.contrib.auth.decorators import login_required, permission_required, user_passes_test
@@ -22,6 +22,8 @@ import requests
 from rest_framework import viewsets, status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+import uuid
+
 
 # VIEWSETS
 class TipoProductoViewset(viewsets.ModelViewSet):
@@ -102,14 +104,15 @@ def gestionar_pedidos(request):
 @login_required
 def aprobar_pedido(request, pedido_id):
     pedido = Pedido.objects.get(pk=pedido_id)
-    pedido.estado = 'aprobado'
+    pedido.estado = 'pendiente de pago'
+    pedido.payment_token = uuid.uuid4()  # Generar un nuevo token único
     pedido.save()
 
     # Enviar notificación al cliente
     current_site = get_current_site(request)
-    pagar_url = request.build_absolute_uri(reverse('generar_boleta_webpay'))
+    pagar_url = request.build_absolute_uri(reverse('generar_boleta_webpay') + f'?token={pedido.payment_token}')
     mensaje = format_html(
-        'Hola {}, tu pedido con ID {} ha sido aprobado. <br>'
+        'Hola {}, tu pedido con ID {} ha sido aprobado y está pendiente de pago. <br>'
         '<a href="{}" class="btn btn-primary">Realizar Pago</a>',
         pedido.usuario.first_name, pedido.id, pagar_url
     )
@@ -117,14 +120,16 @@ def aprobar_pedido(request, pedido_id):
     send_mail(
         'Pedido Aprobado',
         mensaje,
-        'pardodev78@gmail.com',  # Cambia esto por tu dirección de correo
+        'pardodev78@gmail.com',
         [pedido.usuario.email],
         fail_silently=False,
         html_message=mensaje
     )
 
-    messages.success(request, 'El pedido ha sido aprobado y el cliente ha sido notificado.')
+    messages.success(request, 'El pedido ha sido aprobado y está pendiente de pago. El cliente ha sido notificado.')
     return redirect('GESTIONAR_PEDIDOS')
+
+
 
 
 @login_required
@@ -213,24 +218,33 @@ def anular_pedido(request, pedido_id):
 # ============================================================================
 # WEBPAY PLUS
 # ============================================================================
+
 def webpay_plus_commit(request):
     if request.method == 'GET':
-        token = request.GET.get("token_ws")
-        if token is None:
-            return HttpResponseBadRequest("El parámetro 'token_ws' es requerido en la URL.")
+        payment_token = request.GET.get("token")
+        if not payment_token:
+            return HttpResponseBadRequest("Token faltante en la URL.")
 
-        response = Transaction().commit(token=token)
-        productos = []
-        precio_total = 0
-        if response['status'] == 'AUTHORIZED':
-            try:
-                pedido = Pedido.objects.get(usuario=request.user, estado='aprobado')
+        try:
+            # Verificar el token y obtener el pedido
+            pedido = Pedido.objects.get(payment_token=payment_token, estado='pendiente de pago')
+            user = pedido.usuario
+            # Autenticar al usuario
+            auth_login(request, user)
+
+            token_ws = request.GET.get("token_ws")
+            if not token_ws:
+                return HttpResponseBadRequest("El parámetro 'token_ws' es requerido en la URL.")
+
+            response = Transaction().commit(token=token_ws)
+            productos = []
+            precio_total = 0
+            if response['status'] == 'AUTHORIZED':
                 items_carrito = pedido.carrito.carritoitem_set.all()
                 precio_total = sum(item.cantidad * item.producto.precio for item in items_carrito)
 
-                # Crear la boleta y detalles solo si el carrito no está vacío
                 if items_carrito.exists():
-                    boleta = Boleta(usuario=request.user, total=precio_total)
+                    boleta = Boleta(usuario=user, total=precio_total)
                     boleta.save()
 
                     for item in items_carrito:
@@ -245,21 +259,21 @@ def webpay_plus_commit(request):
                             'subtotal': subtotal
                         })
 
-                    # Vaciar el carrito
                     pedido.carrito.carritoitem_set.all().delete()
+                    pedido.estado = 'aprobado'
+                    pedido.save()
 
-                    # Borrar el pedido asociado
-                    pedido.delete()
-
-            except Pedido.DoesNotExist:
-                return render(request, 'webpay/plus/error.html', {'error': 'El pedido no existe'})
-
-        context = {'token': token, 'response': response, 'productos': productos, 'total': precio_total}
-        return render(request, 'webpay/plus/commit.html', context)
+            context = {'token': token_ws, 'response': response, 'productos': productos, 'total': precio_total}
+            return render(request, 'webpay/plus/commit.html', context)
+        except Pedido.DoesNotExist:
+            return HttpResponseBadRequest("Token inválido o pedido no encontrado.")
     elif request.method == 'POST':
         token = request.POST.get("token_ws")
         response = {"error": "Transacción con errores"}
         return render(request, 'webpay/plus/commit.html', {'token': token, 'response': response})
+
+
+
 
 
 
@@ -270,7 +284,7 @@ def webpay_plus_commit(request):
 def generarBoleta(request):
     if request.method == 'GET':
         try:
-            pedido = Pedido.objects.get(usuario=request.user, estado='aprobado')
+            pedido = Pedido.objects.get(usuario=request.user, estado='pendiente de pago')
             carrito = pedido.carrito
             items_carrito = carrito.carritoitem_set.all()
             if not items_carrito:
@@ -279,17 +293,19 @@ def generarBoleta(request):
             precio_total = sum(item.cantidad * item.producto.precio for item in items_carrito)
             buy_order = str(random.randrange(1000000, 99999999))
             session_id = str(random.randrange(1000000, 99999999))
-            return_url = request.build_absolute_uri('/webpay-plus/commit')
+            return_url = request.build_absolute_uri(reverse('webpay_plus_commit') + f'?token={pedido.payment_token}')
 
             response = Transaction().create(buy_order, session_id, precio_total, return_url)
             return render(request, 'webpay/plus/create.html', {'response': response})
         except Pedido.DoesNotExist:
-            messages.error(request, 'No se encontró un pedido aprobado.')
+            messages.error(request, 'No se encontró un pedido pendiente de pago.')
             return redirect('CARRITO')
         except Exception as e:
             return render(request, 'webpay/plus/error.html', {'error': str(e)})
     else:
         return render(request, 'webpay/plus/error.html', {'error': 'Método HTTP no permitido'})
+
+
 
 
 
@@ -315,8 +331,6 @@ def webpay_plus_refund_form(request):
     return render(request, 'webpay/plus/refund-form.html')
 
 #
-def webpay_plus_refund_form(request):
-    return render(request, 'webpay/plus/refund-form.html')
 
 #
 def status(request):
@@ -358,7 +372,7 @@ def login(request):
         password = request.POST.get("password")
         user = authenticate(request, username=username, password=password)
         if user is not None and user.is_active:
-            login_aut(request, user)
+            auth_login(request, user)
             if user.groups.filter(name='cliente').exists():
                 return redirect(to="CARRITO")
             elif user.groups.filter(name='vendedor').exists():
@@ -566,13 +580,18 @@ def perfil_usuario(request):
     usuario = get_object_or_404(User, pk=request.user.pk)
     boletas = Boleta.objects.filter(usuario=usuario)
     detalles_boletas = DetalleBoleta.objects.filter(boleta__in=boletas)
+    pedidos = Pedido.objects.filter(usuario=request.user).order_by('-creado_en')
+    for pedido in pedidos:
+        pedido.items = DetallePedido.objects.filter(pedido=pedido)
 
     context = {
         'usuario': usuario,
         'boletas': boletas,
         'detalles_boletas': detalles_boletas,
+        'pedidos': pedidos,  # Añadir pedidos al contexto
     }
     return render(request, 'perfil_usuario.html', context)
+
 
 @login_required
 def actualizar_perfil(request):

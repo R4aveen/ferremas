@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
+import uuid
 
 # Create your models here.
 class CategoriaProducto(models.Model):
@@ -58,6 +59,7 @@ class CarritoItem(models.Model):
 class Pedido(models.Model):
     ESTADO_PEDIDO = [
         ('pendiente', 'Pendiente'),
+        ('pendiente de pago', 'Pendiente de pago'),
         ('aprobado', 'Aprobado'),
         ('preparando', 'Preparando'),
         ('enviado', 'Enviado'),
@@ -66,11 +68,12 @@ class Pedido(models.Model):
     ]
     usuario = models.ForeignKey(User, on_delete=models.CASCADE)
     carrito = models.OneToOneField(Carrito, on_delete=models.CASCADE)
-    estado = models.CharField(max_length=10, choices=ESTADO_PEDIDO, default='pendiente')
+    estado = models.CharField(max_length=20, choices=ESTADO_PEDIDO, default='pendiente')
     creado_en = models.DateTimeField(default=timezone.now)
     actualizado_en = models.DateTimeField(auto_now=True)
     direccion_envio = models.CharField(max_length=255, null=True, blank=True)
     metodo_pago = models.CharField(max_length=50, null=True, blank=True)
+    payment_token = models.UUIDField(default=uuid.uuid4, editable=False)  # Sin unique=True
 
     def __str__(self):
         return f"Pedido {self.id} - {self.usuario} - {self.estado}"

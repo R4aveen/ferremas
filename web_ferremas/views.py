@@ -584,10 +584,10 @@ def actualizar_perfil(request):
         usuario.direccion = request.POST['direccion']
         usuario.save()
         messages.success(request, 'Perfil actualizado exitosamente')
-        return redirect('perfil_usuario')
+        return redirect('PERFIL_USUARIO')
     else:
         messages.error(request, 'Error al actualizar el perfil')
-        return redirect('perfil_usuario')
+        return redirect('PERFIL_USUARIO')
 
 
 

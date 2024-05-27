@@ -42,7 +42,7 @@
             {% for producto in page_obj %}
             <div class="col-md-4 mb-4">
                 <div class="card mx-4" style="width: 20rem;">
-                    <img src="{{ producto.imagen.url }}" class="card-img-top">
+                    <img src="{{ producto.imagen }}" class="card-img-top">
                     <div class="card-body">
                         <h5 class="card-title" style="text-align: center;">{{ producto.nombre }}</h5>
                         <p class="card-text" style="color: black; text-align: center;">${{ producto.precio }}</p>

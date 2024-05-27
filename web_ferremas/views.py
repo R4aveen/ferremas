@@ -171,6 +171,8 @@ def realizar_pedido(request):
     pedido_existente = Pedido.objects.filter(carrito=carrito).exclude(estado__in=['cancelado', 'entregado']).first()
     
     if not pedido_existente:
+
+        direccion_envio = request.user.direccion if hasattr(request.user, 'direccion') else 'Dirección no proporcionada'
         # Crear un nuevo pedido si no existe uno pendiente o aprobado
         pedido = Pedido.objects.create(
             usuario=request.user,

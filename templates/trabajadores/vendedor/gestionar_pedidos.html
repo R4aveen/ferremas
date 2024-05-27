@@ -3,6 +3,23 @@
 
 {% block css %}
 <style>
+
+.container-sec{
+    background-color: #a87b4de7;
+    padding: 20px;
+    margin: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(253, 251, 251, 0.1);
+    max-width: 80%;
+    margin-left: auto;
+    margin-right: auto;
+}
+    .container{
+    margin-bottom: 20px;
+    border-radius: 10px;
+    align-items: center;
+}
+
     body {
         font-family: Arial, sans-serif;
         background: url("{% static 'images/background.jpg' %}") no-repeat center center fixed;
@@ -14,6 +31,7 @@
         text-align: center;
         font-size: 2rem;
         margin: 2rem 0;
+        color: #ffffff;
     }
 
     .tabla-pedidos-container {
@@ -80,6 +98,8 @@
 {% endblock css %}
 
 {% block contenido %}
+<section class="container-sec">
+    <div class="container">
 <h2 class="titulo-gestionar-pedidos">Gestionar Pedidos</h2>
 <div class="tabla-pedidos-container">
     <table class="tabla-pedidos">
@@ -112,4 +132,6 @@
         </tbody>
     </table>
 </div>
+</div>
+</section>
 {% endblock %}

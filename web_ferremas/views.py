@@ -105,16 +105,12 @@ def gestionar_pedidos(request):
 def aprobar_pedido(request, pedido_id):
     pedido = Pedido.objects.get(pk=pedido_id)
     pedido.estado = 'pendiente de pago'
+    pedido.payment_token = uuid.uuid4()  # Generar un nuevo token único
     pedido.save()
-
-    # Generar un token único
-    token = str(uuid.uuid4())
-    # Guardar el token en la sesión del usuario
-    request.session['payment_token'] = token
 
     # Enviar notificación al cliente
     current_site = get_current_site(request)
-    pagar_url = request.build_absolute_uri(reverse('generar_boleta_webpay') + f'?token={token}')
+    pagar_url = request.build_absolute_uri(reverse('generar_boleta_webpay') + f'?token={pedido.payment_token}')
     mensaje = format_html(
         'Hola {}, tu pedido con ID {} ha sido aprobado y está pendiente de pago. <br>'
         '<a href="{}" class="btn btn-primary">Realizar Pago</a>',
@@ -132,6 +128,7 @@ def aprobar_pedido(request, pedido_id):
 
     messages.success(request, 'El pedido ha sido aprobado y está pendiente de pago. El cliente ha sido notificado.')
     return redirect('GESTIONAR_PEDIDOS')
+
 
 
 
@@ -221,34 +218,33 @@ def anular_pedido(request, pedido_id):
 # ============================================================================
 # WEBPAY PLUS
 # ============================================================================
-from django.contrib.auth import login as auth_login
 
 def webpay_plus_commit(request):
     if request.method == 'GET':
-        token = request.GET.get("token")
-        if token is None or token != request.session.get('payment_token'):
-            return HttpResponseBadRequest("Token inválido o faltante en la URL.")
+        payment_token = request.GET.get("token")
+        if not payment_token:
+            return HttpResponseBadRequest("Token faltante en la URL.")
 
-        # Autenticar al usuario (asegurándonos de que el token es válido)
-        if not request.user.is_authenticated:
-            user = get_object_or_404(User, username=request.session.get('username'))
+        try:
+            # Verificar el token y obtener el pedido
+            pedido = Pedido.objects.get(payment_token=payment_token, estado='pendiente de pago')
+            user = pedido.usuario
+            # Autenticar al usuario
             auth_login(request, user)
 
-        token_ws = request.GET.get("token_ws")
-        if token_ws is None:
-            return HttpResponseBadRequest("El parámetro 'token_ws' es requerido en la URL.")
+            token_ws = request.GET.get("token_ws")
+            if not token_ws:
+                return HttpResponseBadRequest("El parámetro 'token_ws' es requerido en la URL.")
 
-        response = Transaction().commit(token=token_ws)
-        productos = []
-        precio_total = 0
-        if response['status'] == 'AUTHORIZED':
-            try:
-                pedido = Pedido.objects.get(usuario=request.user, estado='pendiente de pago')
+            response = Transaction().commit(token=token_ws)
+            productos = []
+            precio_total = 0
+            if response['status'] == 'AUTHORIZED':
                 items_carrito = pedido.carrito.carritoitem_set.all()
                 precio_total = sum(item.cantidad * item.producto.precio for item in items_carrito)
 
                 if items_carrito.exists():
-                    boleta = Boleta(usuario=request.user, total=precio_total)
+                    boleta = Boleta(usuario=user, total=precio_total)
                     boleta.save()
 
                     for item in items_carrito:
@@ -267,15 +263,15 @@ def webpay_plus_commit(request):
                     pedido.estado = 'aprobado'
                     pedido.save()
 
-            except Pedido.DoesNotExist:
-                return render(request, 'webpay/plus/error.html', {'error': 'El pedido no existe'})
-
-        context = {'token': token_ws, 'response': response, 'productos': productos, 'total': precio_total}
-        return render(request, 'webpay/plus/commit.html', context)
+            context = {'token': token_ws, 'response': response, 'productos': productos, 'total': precio_total}
+            return render(request, 'webpay/plus/commit.html', context)
+        except Pedido.DoesNotExist:
+            return HttpResponseBadRequest("Token inválido o pedido no encontrado.")
     elif request.method == 'POST':
         token = request.POST.get("token_ws")
         response = {"error": "Transacción con errores"}
         return render(request, 'webpay/plus/commit.html', {'token': token, 'response': response})
+
 
 
 
@@ -297,7 +293,7 @@ def generarBoleta(request):
             precio_total = sum(item.cantidad * item.producto.precio for item in items_carrito)
             buy_order = str(random.randrange(1000000, 99999999))
             session_id = str(random.randrange(1000000, 99999999))
-            return_url = request.build_absolute_uri('/webpay-plus/commit')
+            return_url = request.build_absolute_uri(reverse('webpay_plus_commit') + f'?token={pedido.payment_token}')
 
             response = Transaction().create(buy_order, session_id, precio_total, return_url)
             return render(request, 'webpay/plus/create.html', {'response': response})
@@ -308,6 +304,7 @@ def generarBoleta(request):
             return render(request, 'webpay/plus/error.html', {'error': str(e)})
     else:
         return render(request, 'webpay/plus/error.html', {'error': 'Método HTTP no permitido'})
+
 
 
 
@@ -606,10 +603,10 @@ def actualizar_perfil(request):
         usuario.direccion = request.POST['direccion']
         usuario.save()
         messages.success(request, 'Perfil actualizado exitosamente')
-        return redirect('perfil_usuario')
+        return redirect('PERFIL_USUARIO')
     else:
         messages.error(request, 'Error al actualizar el perfil')
-        return redirect('perfil_usuario')
+        return redirect('PERFIL_USUARIO')
 
 
 

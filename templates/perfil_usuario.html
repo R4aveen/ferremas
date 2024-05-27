@@ -1,8 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
 
-
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -59,7 +57,84 @@
                 </div>
             </div>
         </div>
+        <div class="historial-pedidos">
+            <h2>Tus Pedidos</h2>
+            <div class="pedidos-scroll">
+                <ul>
+                    {% for pedido in pedidos %}
+                        <li>
+                            <strong>Pedido ID:</strong> {{ pedido.id }} - <strong>Estado:</strong> {{ pedido.estado }} - <strong>Fecha:</strong> {{ pedido.creado_en }}
+                            <ul>
+                                {% for item in pedido.items %}
+                                    <li>{{ item.producto.nombre }} - Cantidad: {{ item.cantidad }}</li>
+                                {% endfor %}
+                            </ul>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
     </main>
-    {% endblock contenido %}
 </body>
+<style>
+    .main-perfil {
+    margin: 20px auto;
+    max-width: 800px;
+}
+
+.perfil-container {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.datos-personales,
+.historial-boletas {
+    width: 45%;
+}
+
+.historial-pedidos {
+    margin-top: 20px;
+}
+
+.boletas-scroll,
+.pedidos-scroll {
+    max-height: 200px;
+    overflow-y: auto;
+    border: 1px solid #ddd;
+    padding: 10px;
+}
+
+ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+li {
+    margin-bottom: 10px;
+}
+
+.btn-guardar {
+    background-color: green;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+}
+
+.btn-actualizar {
+    background-color: orange;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+}
+
+.btn-guardar:hover,
+.btn-actualizar:hover {
+    opacity: 0.8;
+}
+
+</style>
+    {% endblock contenido %}
 </html>

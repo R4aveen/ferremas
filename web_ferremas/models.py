@@ -58,6 +58,7 @@ class CarritoItem(models.Model):
 class Pedido(models.Model):
     ESTADO_PEDIDO = [
         ('pendiente', 'Pendiente'),
+        ('pendiente de pago', 'Pendiente de Pago'),  # Nuevo estado
         ('aprobado', 'Aprobado'),
         ('preparando', 'Preparando'),
         ('enviado', 'Enviado'),
@@ -66,7 +67,7 @@ class Pedido(models.Model):
     ]
     usuario = models.ForeignKey(User, on_delete=models.CASCADE)
     carrito = models.OneToOneField(Carrito, on_delete=models.CASCADE)
-    estado = models.CharField(max_length=10, choices=ESTADO_PEDIDO, default='pendiente')
+    estado = models.CharField(max_length=20, choices=ESTADO_PEDIDO, default='pendiente')
     creado_en = models.DateTimeField(default=timezone.now)
     actualizado_en = models.DateTimeField(auto_now=True)
     direccion_envio = models.CharField(max_length=255, null=True, blank=True)

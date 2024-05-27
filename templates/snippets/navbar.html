@@ -11,7 +11,7 @@
         <li><a href="#" class="enlace">Sobre Nosotros</a></li>
         {% if user.is_authenticated %}
             <li><a href="{% url 'CARRITO' %}" class="enlace">Carrito</a></li>
-            <li><a href="#" class="enlace btn-ingresar">Mi Perfil</a></li>
+            <li><a href="{% url 'PERFIL_USUARIO' %}" class="enlace btn-ingresar">Mi Perfil</a></li>
             <li><a href="{% url 'CERRAR_SESION' %}" class="enlace btn-cerrar">Cerrar Sesión</a></li>
         {% else %}
             <li><a href="{% url 'LOGIN' %}" class="enlace btn-ingresar">Ingresar</a></li>

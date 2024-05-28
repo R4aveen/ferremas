@@ -3,58 +3,87 @@
 
 {% block css %}
 <style>
-    * {
-        color: white;
+    body {
+        background-color: #f7f7f7;
+        font-family: Arial, sans-serif;
+    }
+    .container {
+        background-color: #fff;
+        padding: 2rem;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    h1 {
+        color: #333;
+        font-weight: bold;
+        text-align: center;
     }
     table {
         border-collapse: collapse;
         width: 100%;
         margin-top: 2rem;
     }
+    th, td {
+        border: 1px solid #ddd;
+        padding: 1rem;
+        text-align: center;
+    }
     th {
-        border: 1px solid black;
-        padding: 0.5rem;
-        text-align: center;
+        background-color: #4CAF50;
         color: white;
-    }
-    td {
-        border: 1px solid black;
-        padding: 0.5rem;
-        text-align: center;
-        color: black;
-    }
-    .row-top {
-        background-color: black;
-        color: white;
-    }
-    .row-content {
-        background-color: white;
     }
     .row-content:nth-child(even) {
-        background-color: lightgray;
+        background-color: #f2f2f2;
+    }
+    .row-content:nth-child(odd) {
+        background-color: #e9e9e9;
     }
     .btn {
-        color: white;
-        padding: 0.3rem 0.5rem;
+        padding: 0.5rem 1rem;
         text-decoration: none;
         border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
     }
-    
-    .row-bottom {
-        background-color: black;
-    }
-    .row-bottom td {
+    .btn-danger {
+        background-color: #f44336;
         color: white;
+    }
+    .btn-danger:hover {
+        background-color: #d32f2f;
+    }
+    .btn-success {
+        background-color: #4CAF50;
+        color: white;
+    }
+    .btn-success:hover {
+        background-color: #388E3C;
+    }
+    .btn-warning {
+        background-color: #ff9800;
+        color: white;
+    }
+    .btn-warning:hover {
+        background-color: #f57c00;
     }
     .btn.disabled {
         background-color: gray;
         cursor: not-allowed;
     }
+    .text-end {
+        text-align: right;
+    }
+    .total, .iva, .total-con-iva {
+        font-size: 1.2rem;
+        font-weight: bold;
+        color: #333;
+    }
 </style>
 {% endblock css %}
 
 {% block contenido %}
-<div class="container" style="height: 35rem;">
+<div class="container">
     <h1 class="mt-5">Carrito de Compras</h1>
     
     {% if messages %}
@@ -90,27 +119,37 @@
                     <img src="{% static 'img/add.png' %}" style="width: 2rem; height: 2rem;">
                 </a>
             </td>
-            <td class="text-center">$ {{ item.producto.precio }}</td>
-            <td class="text-center">{{ item.precio_total }}</td>
+            <td class="text-center">$ {{ item.precio_formato }} CLP</td>
+            <td class="text-center">{{ item.subtotal_formato }} CLP</td>
             <td class="text-center">
                 <a href="{% url 'ELIMINAR_DEL_CARRITO' item.pk %}" class="btn btn-danger">Eliminar</a>
             </td>
         </tr>
         {% endfor %}
         <tr class="row-bottom">
-            <td colspan="4" class="text-end"><h3>TOTAL :</h3></td>
-            <td class="text-end" colspan="2"><h3>$ {{ total_formato }} CLP</h3></td>
+            <td colspan="4" class="text-end"><h3 class="total">TOTAL :</h3></td>
+            <td class="text-end" colspan="2"><h3 class="total">$ {{ total_formato }} CLP</h3></td>
+        </tr>
+        <tr class="row-bottom">
+            <td colspan="4" class="text-end"><h3 class="iva">IVA (19%) :</h3></td>
+            <td class="text-end" colspan="2"><h3 class="iva">$ {{ iva_formato }} CLP</h3></td>
+        </tr>
+        <tr class="row-bottom">
+            <td colspan="4" class="text-end"><h3 class="total-con-iva">TOTAL CON IVA :</h3></td>
+            <td class="text-end" colspan="2"><h3 class="total-con-iva">$ {{ total_con_iva_formato }} CLP</h3></td>
         </tr>
     </table>
-    <a href="{% url 'VACIAR_CARRITO' %}" class="btn btn-danger mt-3">VACIAR CARRITO</a>
-    {% if not pedido_aprobado %}
-    <a href="{% url 'REALIZAR_PEDIDO' %}" class="btn btn-success mt-3">Realizar Pedido</a>
-    {% if pedido %}
-    <a href="{% url 'ANULAR_PEDIDO' pedido.id %}" class="btn btn-warning mt-3">Anular Pedido</a>
-    {% endif %}
-    {% else %}
-    <a href="{% url 'generar_boleta_webpay' %}" class="btn btn-warning mt-3" style="display: none;">Proceder al Pago</a>
-    {% endif %}
+    <div class="text-center mt-3">
+        <a href="{% url 'VACIAR_CARRITO' %}" class="btn btn-danger mt-3">VACIAR CARRITO</a>
+        {% if not pedido_aprobado %}
+        <a href="{% url 'REALIZAR_PEDIDO' %}" class="btn btn-success mt-3">Realizar Pedido</a>
+        {% if pedido %}
+        <a href="{% url 'ANULAR_PEDIDO' pedido.id %}" class="btn btn-warning mt-3">Anular Pedido</a>
+        {% endif %}
+        {% else %}
+        <a href="{% url 'generar_boleta_webpay' %}" class="btn btn-warning mt-3" style="display: none;">Proceder al Pago</a>
+        {% endif %}
+    </div>
     {% else %}
     <div style="background-color: rgba(245, 245, 245, 0.849); border: solid 2px black; padding: 2rem 2rem;
                 border-radius: 3rem;">

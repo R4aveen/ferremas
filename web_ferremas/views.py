@@ -551,23 +551,50 @@ def tipoprod(request, tipoprod_id):
 
 
 ### carrito
+from decimal import Decimal
+from django.utils.formats import number_format
+
 @login_required(login_url='/login/')
 def carrito(request):
-    response_carrito = requests.get('http://127.0.0.1:8000/api/carrito_compras/')
-    data_carrito = response_carrito.json()
-    carritos = data_carrito
+    # Obtener el valor actual del dólar
+    response_dolar = requests.get('https://mindicador.cl/api/dolar')
+    data_dolar = response_dolar.json()
+    valor_dolar = Decimal(data_dolar['serie'][0]['valor'])
 
     # Usar get_or_create para manejar el caso en que no existe un carrito
     carrito, created = Carrito.objects.get_or_create(usuario=request.user)
 
     items_carrito = CarritoItem.objects.filter(carrito=carrito)
-    total = sum(item.precio_total() for item in items_carrito)
+    # Convertir los precios de los productos a CLP y calcular el subtotal
+    for item in items_carrito:
+        item.precio = round(item.producto.precio * valor_dolar)  # Precio en CLP redondeado
+        item.subtotal = item.precio * item.cantidad  # Subtotal en CLP
+        item.save()
+
+    total = sum(item.subtotal for item in items_carrito)
+    iva = total * Decimal('0.19')  # Calcular el IVA del 19%
+    total_con_iva = total + iva  # Total con IVA incluido
+    
+    for item in items_carrito:
+        item.precio = round(item.producto.precio * valor_dolar)  # Precio en CLP redondeado
+        item.subtotal = item.precio * item.cantidad  # Subtotal en CLP
+        item.save()
+    # Formatear los valores para la plantilla
+    total_formato = number_format(total, decimal_pos=0, use_l10n=True)
+    iva_formato = number_format(iva, decimal_pos=0, use_l10n=True)
+    total_con_iva_formato = number_format(total_con_iva, decimal_pos=0, use_l10n=True)
+    for item in items_carrito:
+        item.subtotal_formato = number_format(item.subtotal, decimal_pos=0, use_l10n=True)
+        item.precio_formato = number_format(item.precio, decimal_pos=0, use_l10n=True)
+
     pedido = Pedido.objects.filter(carrito=carrito).first()
     pedido_aprobado = pedido and pedido.estado == 'aprobado'
 
     return render(request, 'carrito.html', {
         'items_carrito': items_carrito,
-        'total_formato': total,
+        'total_formato': total_formato,
+        'iva_formato': iva_formato,
+        'total_con_iva_formato': total_con_iva_formato,
         'carrito': carrito,
         'pedido_aprobado': pedido_aprobado,
         'pedido': pedido,

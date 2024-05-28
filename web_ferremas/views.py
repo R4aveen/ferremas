@@ -472,6 +472,7 @@ def registro(request):
     return render(request, 'registro.html')
 
 def productos(request):
+
     response_productos = requests.get('http://127.0.0.1:8000/api/productos/')
     response_categorias = requests.get('http://127.0.0.1:8000/api/categorias_producto/')
     response_tipos = requests.get('http://127.0.0.1:8000/api/tipos_producto/')
@@ -556,29 +557,23 @@ from django.utils.formats import number_format
 
 @login_required(login_url='/login/')
 def carrito(request):
-    # Obtener el valor actual del dólar
     response_dolar = requests.get('https://mindicador.cl/api/dolar')
     data_dolar = response_dolar.json()
     valor_dolar = Decimal(data_dolar['serie'][0]['valor'])
 
-    # Usar get_or_create para manejar el caso en que no existe un carrito
     carrito, created = Carrito.objects.get_or_create(usuario=request.user)
 
     items_carrito = CarritoItem.objects.filter(carrito=carrito)
-    # Convertir los precios de los productos a CLP y calcular el subtotal
     for item in items_carrito:
-        item.precio = round(item.producto.precio * valor_dolar)  # Precio en CLP redondeado
-        item.subtotal = item.precio * item.cantidad  # Subtotal en CLP
+        item.precio = round(item.producto.precio * valor_dolar / 1000)  
+        item.subtotal = round(item.producto.precio * item.cantidad )  
         item.save()
 
     total = sum(item.subtotal for item in items_carrito)
-    iva = total * Decimal('0.19')  # Calcular el IVA del 19%
-    total_con_iva = total + iva  # Total con IVA incluido
+    iva = total * Decimal('0.19') 
+    total_con_iva = total + iva  
     
-    for item in items_carrito:
-        item.precio = round(item.producto.precio * valor_dolar)  # Precio en CLP redondeado
-        item.subtotal = item.precio * item.cantidad  # Subtotal en CLP
-        item.save()
+
     # Formatear los valores para la plantilla
     total_formato = number_format(total, decimal_pos=0, use_l10n=True)
     iva_formato = number_format(iva, decimal_pos=0, use_l10n=True)

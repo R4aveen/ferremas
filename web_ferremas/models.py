@@ -74,7 +74,7 @@ class Pedido(models.Model):
     direccion_envio = models.CharField(max_length=255, null=True, blank=True)
     metodo_pago = models.CharField(max_length=50, null=True, blank=True)
     payment_token = models.UUIDField(default=uuid.uuid4, editable=False)  # Sin unique=True
-
+    
     def __str__(self):
         return f"Pedido {self.id} - {self.usuario} - {self.estado}"
 

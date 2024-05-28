@@ -119,7 +119,7 @@
                     <img src="{% static 'img/add.png' %}" style="width: 2rem; height: 2rem;">
                 </a>
             </td>
-            <td class="text-center">$ {{ item.precio_formato }} CLP</td>
+            <td class="text-center">$ {{ item.producto.precio }} CLP</td>
             <td class="text-center">{{ item.subtotal_formato }} CLP</td>
             <td class="text-center">
                 <a href="{% url 'ELIMINAR_DEL_CARRITO' item.pk %}" class="btn btn-danger">Eliminar</a>

@@ -127,7 +127,7 @@
                     <input type="email" id="correo" name="correo" value="{{ usuario.email }}" required>
 
                     <label for="direccion">Dirección</label>
-                    <input type="text" id="direccion" name="direccion" value="{{ usuario.direccion }}" required>
+                    <input type="text" id="direccion" name="direccion" value="Pasaje Opalo #1470" required>
 
                     <div class="botones-accion">
                         <button type="submit" class="btn-guardar">Guardar</button>
@@ -156,7 +156,8 @@
             </div>
         </div>
         <div class="historial-pedidos">
-            <h2>Tus Pedidos</h2>
+            <span style="display: flex; flex-direction: row; align-items: end;"><h2>Tus Pedidos</h2>  <p>(pedido_actual)</p></span>
+            
             <div class="tabla-pedidos-container">
                 <table class="tabla-pedidos">
                     <thead>

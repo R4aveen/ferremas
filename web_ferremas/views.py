@@ -839,6 +839,8 @@ from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 from django.http import HttpResponse
 from io import BytesIO
+from reportlab.lib import colors
+from reportlab.lib.units import inch
 
 def generar_pdf_transaccion(request, pedido_id):
     pedido = get_object_or_404(Pedido, pk=pedido_id)
@@ -847,18 +849,46 @@ def generar_pdf_transaccion(request, pedido_id):
 
     buffer = BytesIO()
     p = canvas.Canvas(buffer, pagesize=letter)
-    p.drawString(100, 750, "Resultado de Transacción")
-    p.drawString(100, 730, f"ID del Pedido: {pedido_id}")
-    p.drawString(100, 710, f"Status: {pedido.estado}")
 
-    # Añadir detalles de productos
-    p.drawString(100, 690, "Productos:")
-    y = 670
-    for item in CarritoItem.objects.filter(carrito=pedido.carrito):
-        p.drawString(100, y, f"Producto: {item.producto.nombre}, Cantidad: {item.cantidad}, Subtotal: {item.precio_total()}")
-        y -= 20
+    # Adjusted Title Position
+    p.setFont("Helvetica-Bold", 16)
+    p.drawString(1 * inch, 10.3 * inch, "Resultado de Transacción")
+    p.setFont("Helvetica", 12)
+    p.drawString(1 * inch, 9.9 * inch, f"ID del Pedido: {pedido_id}")
+    p.drawString(1 * inch, 9.6 * inch, f"Status: {pedido.estado}")
+    
+    # Line
+    p.setLineWidth(0.5)
+    p.line(1 * inch, 9.4 * inch, 7.5 * inch, 9.4 * inch)
 
-    p.drawString(100, y, f"Total: {sum(item.precio_total() for item in CarritoItem.objects.filter(carrito=pedido.carrito))}")
+    # Table Header
+    p.setFont("Helvetica-Bold", 12)
+    p.drawString(1 * inch, 9.2 * inch, "Productos:")
+    
+    p.setFont("Helvetica-Bold", 10)
+    p.drawString(1 * inch, 8.9 * inch, "Producto")
+    p.drawString(3 * inch, 8.9 * inch, "Cantidad")
+    p.drawString(4 * inch, 8.9 * inch, "Subtotal")
+
+    # Table Content
+    y = 8.6 * inch
+    p.setFont("Helvetica", 10)
+    for item in DetallePedido.objects.filter(pedido=pedido):
+        p.drawString(1 * inch, y, f"{item.producto.nombre}")
+        p.drawString(3 * inch, y, f"{item.cantidad}")
+        p.drawString(4 * inch, y, f"${item.subtotal:.2f}")
+        y -= 0.3 * inch
+        if y < 1 * inch:  # New page if too many items
+            p.showPage()
+            p.setFont("Helvetica", 10)
+            y = 10 * inch
+
+    # Total
+    p.setFont("Helvetica-Bold", 10)
+    p.drawString(1 * inch, y, "Total")
+    p.drawString(4 * inch, y, f"${sum(item.subtotal for item in DetallePedido.objects.filter(pedido=pedido)):.2f}")
+
+    
 
     p.showPage()
     p.save()

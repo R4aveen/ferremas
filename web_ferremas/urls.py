@@ -92,4 +92,10 @@ urlpatterns = [
     # DESPACHADOR
     path('ver_pedidos_despachador/', ver_pedidos_despachador, name='ver_pedidos_despachador'),
     path('entregar_pedido_despachador/<int:pedido_id>/', entregar_pedido_despachador, name='entregar_pedido_despachador'),
+
+
+    # PDF UWU
+
+    path('generar_pdf_transaccion/<int:pedido_id>/', generar_pdf_transaccion, name='generar_pdf_transaccion'),
+
 ]

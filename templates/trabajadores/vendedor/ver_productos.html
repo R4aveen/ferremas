@@ -1,96 +1,95 @@
 {% extends 'base.html' %}
 
 {% block contenido %}
-
 <section class="container-sec">
-<div class="container">
-<h2 class="titulo-productos">Productos Disponibles</h2>
-<div class="tabla-productos-container">
-    <table class="tabla-productos" >
-        <thead>
-            <tr>
-                <th>Nombre</th>
-                <th>Precio</th>
-                <th>Stock</th>
-                <th>Descripción</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for producto in productos %}
-            <tr>
-                <td>{{ producto.nombre }}</td>
-                <td>${{ producto.precio }}</td>
-                <td>{{ producto.stock }}</td>
-                <td>{{ producto.descripcion }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-</div>
-</div></section>
+    <div class="container">
+        <h2 class="titulo-productos">Productos Disponibles</h2>
+        <div class="tabla-productos-container">
+            <table class="tabla-productos">
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Precio</th>
+                        <th>Stock</th>
+                        <th>Descripción</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for producto in productos %}
+                    <tr>
+                        <td>{{ producto.nombre }}</td>
+                        <td>${{ producto.precio }}</td>
+                        <td>{{ producto.stock }}</td>
+                        <td>{{ producto.descripcion }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+
 <style>
+    .container-sec {
+        background-color: #a87b4de7;
+        padding: 20px;
+        margin: 20px;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(253, 251, 251, 0.1);
+        max-width: 80%;
+        margin-left: auto;
+        margin-right: auto;
+    }
 
-.container-sec{
-    background-color: #a87b4de7;
-    padding: 20px;
-    margin: 20px;
-    border-radius: 10px;
-    box-shadow: 0 0 10px rgba(253, 251, 251, 0.1);
-    max-width: 80%;
-    margin-left: auto;
-    margin-right: auto;
-}
-    .container{
-    margin-bottom: 20px;
-    border-radius: 10px;
-    align-items: center;
-}
-
+    .container {
+        margin-bottom: 20px;
+        border-radius: 10px;
+        align-items: center;
+    }
 
     body {
-    font-family: Arial, sans-serif;
-    color: #333;
-}
+        font-family: Arial, sans-serif;
+        color: #333;
+    }
 
-.titulo-productos {
-    text-align: center;
-    font-size: 2rem;
-    margin: 2rem 0;
-    color: #ffffff;
-}
+    .titulo-productos {
+        text-align: center;
+        font-size: 2rem;
+        margin: 2rem 0;
+        color: #ffffff;
+    }
 
-.tabla-productos-container {
-    margin: 0 auto;
-    max-width: 80%;
-    background-color: rgba(255, 255, 255, 0.9);
-    padding: 2rem;
-    border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-}
+    .tabla-productos-container {
+        margin: 0 auto;
+        max-width: 80%;
+        background-color: rgba(255, 255, 255, 0.9);
+        padding: 2rem;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
 
-.tabla-productos {
-    width: 100%;
-    border-collapse: collapse;
-}
+    .tabla-productos {
+        width: 100%;
+        border-collapse: collapse;
+    }
 
-.tabla-productos th, .tabla-productos td {
-    border: 1px solid #ddd;
-    padding: 0.8rem;
-    text-align: left;
-}
+    .tabla-productos th, .tabla-productos td {
+        border: 1px solid #ddd;
+        padding: 0.8rem;
+        text-align: left;
+    }
 
-.tabla-productos th {
-    background-color: #4CAF50;
-    color: white;
-}
+    .tabla-productos th {
+        background-color: #343a40;
+        color: white;
+    }
 
-.tabla-productos tr:nth-child(even) {
-    background-color: #f2f2f2;
-}
+    .tabla-productos tr:nth-child(even) {
+        background-color: #f2f2f2;
+    }
 
-.tabla-productos tr:hover {
-    background-color: #ddd;
-}
-
+    .tabla-productos tr:hover {
+        background-color: #ddd;
+    }
 </style>
 {% endblock %}

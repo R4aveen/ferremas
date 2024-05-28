@@ -14,7 +14,7 @@ from django.core.paginator import Paginator
 from django.contrib.auth.models import Group
 from django.core.mail import send_mail
 from django.urls import reverse
-from django.utils.html import format_html
+from django.utils.html import format_html, format_html_join
 from django.contrib.sites.shortcuts import get_current_site
 from django.db.models import Q
 from .serializers import *
@@ -111,15 +111,54 @@ def aprobar_pedido(request, pedido_id):
     # Enviar notificación al cliente
     current_site = get_current_site(request)
     pagar_url = request.build_absolute_uri(reverse('generar_boleta_webpay') + f'?token={pedido.payment_token}')
+
+    # Crear el contenido de la tabla de productos
+    carrito_items = CarritoItem.objects.filter(carrito=pedido.carrito)
+    productos_html = format_html_join(
+        '',
+        '<tr>'
+        '<td style="border: 1px solid #ddd; padding: 8px;">{}</td>'
+        '<td style="border: 1px solid #ddd; padding: 8px;">{}</td>'
+        '<td style="border: 1px solid #ddd; padding: 8px;">{}</td>'
+        '</tr>',
+        ((item.producto.nombre, item.cantidad, "{:.2f}".format(item.precio_total())) for item in carrito_items)
+    )
+    total = sum(item.precio_total() for item in carrito_items)
+
     mensaje = format_html(
-        'Hola {}, tu pedido con ID {} ha sido aprobado y está pendiente de pago. <br>'
-        '<a href="{}" class="btn btn-primary">Realizar Pago</a>',
-        pedido.usuario.first_name, pedido.id, pagar_url
+        '<div style="font-family: Arial, sans-serif; color: #333; line-height: 1.5;">'
+        '  <h2 style="color: #4CAF50;">Hola, {}</h2>'
+        '  <p>Tu pedido con ID <strong>{}</strong> ha sido aprobado y está pendiente de pago.</p>'
+        '  <p>Por favor, haz clic en el siguiente botón para realizar el pago:</p>'
+        '  <a href="{}" style="display: inline-block; padding: 10px 20px; font-size: 16px; color: #fff; background-color: #28a745; text-decoration: none; border-radius: 5px; margin-top: 10px;">Realizar Pago</a>'
+        '  <h3>Resumen del Pedido</h3>'
+        '  <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">'
+        '    <thead>'
+        '      <tr>'
+        '        <th style="border: 1px solid #ddd; padding: 8px; background-color: #333; color: #fff;">Producto</th>'
+        '        <th style="border: 1px solid #ddd; padding: 8px; background-color: #333; color: #fff;">Cantidad</th>'
+        '        <th style="border: 1px solid #ddd; padding: 8px; background-color: #333; color: #fff;">Subtotal</th>'
+        '      </tr>'
+        '    </thead>'
+        '    <tbody>'
+        '      {}'
+        '    </tbody>'
+        '    <tfoot>'
+        '      <tr>'
+        '        <td colspan="2" style="border: 1px solid #ddd; padding: 8px; font-weight: bold;">Total</td>'
+        '        <td style="border: 1px solid #ddd; padding: 8px; font-weight: bold;">{}</td>'
+        '      </tr>'
+        '    </tfoot>'
+        '  </table>'
+        '  <p>Si tienes alguna pregunta, no dudes en contactarnos.</p>'
+        '  <p>Gracias por tu preferencia.</p>'
+        '</div>',
+        pedido.usuario.first_name, pedido.id, pagar_url, productos_html, total
     )
 
     send_mail(
         'Pedido Aprobado',
-        mensaje,
+        '',  # Mensaje de texto plano vacío
         'pardodev78@gmail.com',
         [pedido.usuario.email],
         fail_silently=False,
@@ -265,7 +304,13 @@ def webpay_plus_commit(request):
                     pedido.estado = 'aprobado'
                     pedido.save()
 
-            context = {'token': token_ws, 'response': response, 'productos': productos, 'total': precio_total}
+            context = {
+                'token': token_ws, 
+                'response': response, 
+                'productos': productos, 
+                'total': precio_total,
+                'pedido': pedido  # Añadir el pedido al contexto
+            }
             return render(request, 'webpay/plus/commit.html', context)
         except Pedido.DoesNotExist:
             return HttpResponseBadRequest("Token inválido o pedido no encontrado.")
@@ -273,6 +318,7 @@ def webpay_plus_commit(request):
         token = request.POST.get("token_ws")
         response = {"error": "Transacción con errores"}
         return render(request, 'webpay/plus/commit.html', {'token': token, 'response': response})
+
 
 
 
@@ -384,7 +430,7 @@ def login(request):
         if user is not None and user.is_active:
             auth_login(request, user)
             if user.groups.filter(name='cliente').exists():
-                return redirect(to="CARRITO")
+                return redirect(to="PRODUCTOS")
             elif user.groups.filter(name='vendedor').exists():
                 return redirect(to="ver_productos")
             elif user.groups.filter(name='bodeguero').exists():
@@ -681,12 +727,24 @@ def aceptar_pedido(request, pedido_id):
     pedido.save()
 
     # Notificar al cliente que el pedido está en preparación
+    mensaje_html = format_html(
+        '<div style="font-family: Arial, sans-serif; color: #333; line-height: 1.5;">'
+        '  <h2 style="color: #4CAF50;">Hola, {}</h2>'
+        '  <p>Tu pedido está siendo preparado.</p>'
+        '  <p>Te notificaremos una vez que esté listo para el envío.</p>'
+        '  <p>Si tienes alguna pregunta, no dudes en contactarnos.</p>'
+        '  <p>Gracias por tu preferencia.</p>'
+        '</div>',
+        pedido.usuario.first_name
+    )
+
     send_mail(
         'Pedido en Preparación',
-        f'Tu pedido con ID {pedido.id} está siendo preparado.',
+        '',  # Mensaje de texto plano vacío
         'pardodev78@gmail.com',  # Cambia esto por tu dirección de correo
         [pedido.usuario.email],
         fail_silently=False,
+        html_message=mensaje_html
     )
 
     messages.success(request, 'El pedido está en preparación.')
@@ -700,12 +758,24 @@ def entregar_pedido(request, pedido_id):
     pedido.save()
 
     # Notificar al cliente que el pedido ha sido enviado
+    mensaje_html = format_html(
+        '<div style="font-family: Arial, sans-serif; color: #333; line-height: 1.5;">'
+        '  <h2 style="color: #4CAF50;">Hola, {}</h2>'
+        '  <p>Tu pedido  ha sido enviado.</p>'
+        '  <p>Te notificaremos una vez que esté en camino a tu dirección de envío.</p>'
+        '  <p>Si tienes alguna pregunta, no dudes en contactarnos.</p>'
+        '  <p>Gracias por tu preferencia.</p>'
+        '</div>',
+        pedido.usuario.first_name
+    )
+
     send_mail(
         'Pedido Enviado',
-        f'Tu pedido con ID {pedido.id} ha sido enviado.',
+        '',  # Mensaje de texto plano vacío
         'pardodev78@gmail.com',  # Cambia esto por tu dirección de correo
         [pedido.usuario.email],
         fail_silently=False,
+        html_message=mensaje_html
     )
 
     messages.success(request, 'El pedido ha sido enviado.')
@@ -729,20 +799,74 @@ def ver_pedidos_despachador(request):
 def entregar_pedido_despachador(request, pedido_id):
     pedido = get_object_or_404(Pedido, pk=pedido_id)
     pedido.estado = 'entregado'
+    pedido.hora_entrega = timezone.now()  # Guardar la hora actual de entrega
     pedido.save()
 
+    # Formatear la hora de entrega
+    hora_entrega = pedido.hora_entrega.strftime('%Y-%m-%d %H:%M:%S')
+
     # Notificar al cliente que el pedido ha sido entregado
+    mensaje_html = format_html(
+        '<div style="font-family: Arial, sans-serif; color: #333; line-height: 1.5;">'
+        '  <h2 style="color: #4CAF50;">Hola, {}</h2>'
+        '  <p>Tu pedido ha sido entregado.</p>'
+        '  <p>La entrega se realizó el <strong>{}</strong>.</p>'
+        '  <p>Si tienes alguna pregunta, no dudes en contactarnos.</p>'
+        '  <p>Gracias por tu preferencia.</p>'
+        '</div>',
+        pedido.usuario.first_name, hora_entrega
+    )
+
     send_mail(
         'Pedido Entregado',
-        f'Tu pedido con ID {pedido.id} ha sido entregado.',
+        '',  # Mensaje de texto plano vacío
         'pardodev78@gmail.com',  # Cambia esto por tu dirección de correo
         [pedido.usuario.email],
         fail_silently=False,
+        html_message=mensaje_html
     )
 
-    messages.success(request, 'El pedido ha sido entregado.')
+    # Eliminar los detalles del pedido primero para evitar errores de clave foránea
+    DetallePedido.objects.filter(pedido=pedido).delete()
+
+    # Eliminar el pedido
+    pedido.delete()
+
+    messages.success(request, 'El pedido ha sido entregado y eliminado del sistema.')
     return redirect('ver_pedidos_despachador')
 
+from reportlab.lib.pagesizes import letter
+from reportlab.pdfgen import canvas
+from django.http import HttpResponse
+from io import BytesIO
+
+def generar_pdf_transaccion(request, pedido_id):
+    pedido = get_object_or_404(Pedido, pk=pedido_id)
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="transaccion_{pedido_id}.pdf"'
+
+    buffer = BytesIO()
+    p = canvas.Canvas(buffer, pagesize=letter)
+    p.drawString(100, 750, "Resultado de Transacción")
+    p.drawString(100, 730, f"ID del Pedido: {pedido_id}")
+    p.drawString(100, 710, f"Status: {pedido.estado}")
+
+    # Añadir detalles de productos
+    p.drawString(100, 690, "Productos:")
+    y = 670
+    for item in CarritoItem.objects.filter(carrito=pedido.carrito):
+        p.drawString(100, y, f"Producto: {item.producto.nombre}, Cantidad: {item.cantidad}, Subtotal: {item.precio_total()}")
+        y -= 20
+
+    p.drawString(100, y, f"Total: {sum(item.precio_total() for item in CarritoItem.objects.filter(carrito=pedido.carrito))}")
+
+    p.showPage()
+    p.save()
+
+    pdf = buffer.getvalue()
+    buffer.close()
+    response.write(pdf)
+    return response
 
 
 

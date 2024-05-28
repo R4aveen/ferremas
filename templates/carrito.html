@@ -34,15 +34,12 @@
         background-color: lightgray;
     }
     .btn {
-        background-color: red;
         color: white;
         padding: 0.3rem 0.5rem;
         text-decoration: none;
         border: none;
     }
-    .btn:hover {
-        background-color: darkred;
-    }
+    
     .row-bottom {
         background-color: black;
     }
@@ -107,12 +104,12 @@
     </table>
     <a href="{% url 'VACIAR_CARRITO' %}" class="btn btn-danger mt-3">VACIAR CARRITO</a>
     {% if not pedido_aprobado %}
-    <a href="{% url 'REALIZAR_PEDIDO' %}" class="btn btn-primary mt-3">Realizar Pedido</a>
+    <a href="{% url 'REALIZAR_PEDIDO' %}" class="btn btn-success mt-3">Realizar Pedido</a>
     {% if pedido %}
     <a href="{% url 'ANULAR_PEDIDO' pedido.id %}" class="btn btn-warning mt-3">Anular Pedido</a>
     {% endif %}
     {% else %}
-    <a href="{% url 'generar_boleta_webpay' %}" class="btn btn-success mt-3">Proceder al Pago</a>
+    <a href="{% url 'generar_boleta_webpay' %}" class="btn btn-warning mt-3" style="display: none;">Proceder al Pago</a>
     {% endif %}
     {% else %}
     <div style="background-color: rgba(245, 245, 245, 0.849); border: solid 2px black; padding: 2rem 2rem;

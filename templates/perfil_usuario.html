@@ -1,8 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
 
-
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -10,6 +8,104 @@
     <title>Perfil de Usuario</title>
     {% block css %}
         <link rel="stylesheet" href="{% static 'css/perfil.css' %}">
+        <style>
+            .main-perfil {
+                margin: 20px auto;
+                max-width: 800px;
+            }
+
+            .perfil-container {
+                display: flex;
+                justify-content: space-between;
+                gap: 20px;
+            }
+
+            .datos-personales,
+            .historial-boletas {
+                width: 45%;
+            }
+
+            .historial-pedidos {
+                margin-top: 20px;
+            }
+
+            .boletas-scroll,
+            .pedidos-scroll {
+                max-height: 400px;
+                overflow-y: auto;
+                overflow-anchor: none; /* Para que el scroll no cambie al actualizar */
+                border: 1px solid #ddd;
+                padding: 10px;
+            }
+
+            .boletas-scroll {
+                overflow-y: scroll;
+            }
+
+            ul {
+                list-style-type: none;
+                padding: 0;
+            }
+
+            li {
+                margin-bottom: 10px;
+            }
+
+            .btn-guardar {
+                background-color: green;
+                color: white;
+                border: none;
+                padding: 10px 20px;
+                cursor: pointer;
+            }
+
+            .btn-actualizar {
+                background-color: orange;
+                color: white;
+                border: none;
+                padding: 10px 20px;
+                cursor: pointer;
+            }
+
+            .btn-guardar:hover,
+            .btn-actualizar:hover {
+                opacity: 0.8;
+            }
+
+            .tabla-pedidos-container {
+                margin: 0 auto;
+                max-width: 90%;
+                background: rgba(255, 255, 255, 0.9);
+                padding: 2rem;
+                border-radius: 10px;
+                box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            }
+
+            .tabla-pedidos {
+                width: 100%;
+                border-collapse: collapse;
+                margin-top: 10px;
+            }
+
+            .tabla-pedidos th, .tabla-pedidos td {
+                border: 1px solid #ddd;
+                padding: 0.8rem;
+                text-align: left;
+            }
+
+            .tabla-pedidos th {
+                background-color: #343a40;
+                color: white;
+            }
+
+            .tabla-pedidos tr:nth-child(even) {
+                background-color: #f2f2f2;
+            }
+
+            .tabla-pedidos tr:hover {
+                background-color: #ddd;
+            }
+        </style>
     {% endblock css %}
 </head>
 <body>
@@ -61,82 +157,36 @@
         </div>
         <div class="historial-pedidos">
             <h2>Tus Pedidos</h2>
-            <div class="pedidos-scroll">
-                <ul>
-                    {% for pedido in pedidos %}
-                        <li>
-                            <strong>Pedido ID:</strong> {{ pedido.id }} - <strong>Estado:</strong> {{ pedido.estado }} - <strong>Fecha:</strong> {{ pedido.creado_en }}
-                            <ul>
-                                {% for item in pedido.items %}
+            <div class="tabla-pedidos-container">
+                <table class="tabla-pedidos">
+                    <thead>
+                        <tr>
+                            <th>ID Pedido</th>
+                            <th>Estado</th>
+                            <th>Fecha</th>
+                            <th>Productos</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for pedido in pedidos %}
+                        <tr>
+                            <td>{{ pedido.id }}</td>
+                            <td>{{ pedido.estado }}</td>
+                            <td>{{ pedido.creado_en }}</td>
+                            <td>
+                                <ul>
+                                    {% for item in pedido.items %}
                                     <li>{{ item.producto.nombre }} - Cantidad: {{ item.cantidad }}</li>
-                                {% endfor %}
-                            </ul>
-                        </li>
-                    {% endfor %}
-                </ul>
+                                    {% endfor %}
+                                </ul>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
             </div>
         </div>
     </main>
-</body>
-<style>
-    .main-perfil {
-    margin: 20px auto;
-    max-width: 800px;
-}
-
-.perfil-container {
-    display: flex;
-    justify-content: space-between;
-    gap: 20px;
-}
-
-.datos-personales,
-.historial-boletas {
-    width: 45%;
-}
-
-.historial-pedidos {
-    margin-top: 20px;
-}
-
-.boletas-scroll,
-.pedidos-scroll {
-    max-height: 200px;
-    overflow-y: auto;
-    border: 1px solid #ddd;
-    padding: 10px;
-}
-
-ul {
-    list-style-type: none;
-    padding: 0;
-}
-
-li {
-    margin-bottom: 10px;
-}
-
-.btn-guardar {
-    background-color: green;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    cursor: pointer;
-}
-
-.btn-actualizar {
-    background-color: orange;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    cursor: pointer;
-}
-
-.btn-guardar:hover,
-.btn-actualizar:hover {
-    opacity: 0.8;
-}
-
-</style>
     {% endblock contenido %}
+</body>
 </html>

@@ -557,6 +557,10 @@ from django.utils.formats import number_format
 
 @login_required(login_url='/login/')
 def carrito(request):
+    response_carrito = requests.get('http://127.0.0.1:8000/api/carrito_compras/')
+    data_carrito = response_carrito.json()
+    carrito = data_carrito
+
     response_dolar = requests.get('https://mindicador.cl/api/dolar')
     data_dolar = response_dolar.json()
     valor_dolar = Decimal(data_dolar['serie'][0]['valor'])
@@ -573,6 +577,9 @@ def carrito(request):
     iva = total * Decimal('0.19') 
     total_con_iva = total + iva  
     
+    for item in items_carrito:
+        item.precio = total_con_iva  
+        item.save()
 
     # Formatear los valores para la plantilla
     total_formato = number_format(total, decimal_pos=0, use_l10n=True)

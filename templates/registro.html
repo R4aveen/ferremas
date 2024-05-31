@@ -10,7 +10,7 @@
     <div class="register-box">
         <div class="form-section">
             <h2>Registro Usuario</h2>
-            <form action="{% url 'REGISTRO' %}" method="POST">
+            <form id="registerForm" action="{% url 'REGISTRO' %}" method="POST">
                 {% csrf_token %}
                 <div class="form-group">
                     <input type="text" name="username" id="username" placeholder="Nombre Usuario">
@@ -42,4 +42,26 @@
         </div>
     </div>
 </div>
+
+<!-- SweetAlert2 Script -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    document.getElementById('registerForm').addEventListener('submit', function(event) {
+        const username = document.getElementById('username').value;
+        const email = document.getElementById('email').value;
+        const number = document.getElementById('number').value;
+        const password = document.getElementById('password').value;
+        const repeatPassword = document.getElementById('repeat-password').value;
+        const terms = document.getElementById('terms').checked;
+
+        if (!username || !email || !number || !password || !repeatPassword || !terms) {
+            event.preventDefault();
+            Swal.fire({
+                icon: 'warning',
+                title: 'Advertencia',
+                text: 'Por favor, rellene todos los campos y acepte los términos y condiciones.'
+            });
+        }
+    });
+</script>
 {% endblock contenido %}

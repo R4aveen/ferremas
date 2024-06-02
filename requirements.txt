@@ -156,3 +156,5 @@ websocket-client==1.7.0
 Werkzeug==3.0.3
 zeep==4.2.1
 zipp==3.17.0
+
+django-allauth==0.53.1

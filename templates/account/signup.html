@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% load static %}
+{% load i18n %}
+{% load crispy_forms_tags %}
+
+{% block head_title %}{% trans "Signup" %}{% endblock %}
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/register.css' %}">
+{% endblock css %}
+
+{% block contenido %}
+
+<div class="register-container">
+  <div class="register-box">
+
+
+<div class="form-section">
+  <h2>{% trans "Sign Up" %}</h2>
+<form class="btnes signup" id="signup_form" method="post" action="{% url 'account_signup' %}">
+  {% csrf_token %}
+  {{ form|crispy }}
+  {% if redirect_field_value %}
+  <div class="form-group">
+  <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+</div>
+  {% endif %}
+  <a class="btnes btn google" type="submit">
+  {% trans "Sign Up" %} </a>
+  <dir>
+<p>{% blocktrans %}Already have an account? Then please <a href="{{ login_url }}">sign in</a>.{% endblocktrans %}</p>
+
+  </dir>
+
+</form>
+</div>
+<div class="logo-section">
+  <img src="{% static 'img/OsosMaduros.png' %}" alt="Logo" style="width: 300px;">
+  <a href="#" type="button" class="btn google">Crear con Google</a>
+  
+</div>
+</div>
+</div>
+
+{% endblock %}

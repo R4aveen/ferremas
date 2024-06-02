@@ -230,7 +230,7 @@
                 cancelButtonText: 'Cancelar'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    window.location.href = "{% url 'CERRAR_SESION' %}";
+                    window.location.href = "{% url 'account_logout' %}";
                 }
             })
         });

@@ -32,12 +32,14 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'django.contrib.sites',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
     'web_ferremas',
     'transbank',
     'rest_framework',
@@ -88,7 +90,7 @@ WSGI_APPLICATION = 'main_ferremas.wsgi.application'
 DATABASES = {
     'default' : {
     'ENGINE' : 'django.db.backends.mysql',
-    'NAME' :'myferremas',
+    'NAME' :'ferremax',
     'HOST' :'localhost',
     'PORT' :'3306',
     'USER' :'root',
@@ -191,4 +193,11 @@ if DEBUG:
  
 ACCOUNT_AUTHENTICATED_LOGIN_REDIRECTS = True
 LOGIN_REDIRECT_URL = 'INDEX'
+
+
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_UNIQUE_EMAIL = True
+
+ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
+ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS = 7
     

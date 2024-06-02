@@ -10,15 +10,15 @@
                 <li><a href="{% url 'ver_productos' %}" class="enlace">Ver Productos</a></li>
                 <li><a href="{% url 'GESTIONAR_PEDIDOS' %}" class="enlace">Gestionar Pedidos</a></li>
                 <li><a href="{% url 'PERFIL_USUARIO' %}" class="enlace btn-ingresar">Mi Perfil</a></li>
-                <li><a href="{% url 'CERRAR_SESION' %}" class="enlace btn-cerrar" id="logout-btn">Cerrar Sesión</a></li>
+                <li><a href="{% url 'account_logout' %}" class="enlace btn-cerrar" id="logout-btn">Cerrar Sesión</a></li>
             {% elif user.groups.first.name == "bodeguero" %}
                 <li><a href="{% url 'ver_pedidos' %}" class="enlace">Ver Productos</a></li>
                 <li><a href="{% url 'PERFIL_USUARIO' %}" class="enlace btn-ingresar">Mi Perfil</a></li>
-                <li><a href="{% url 'CERRAR_SESION' %}" class="enlace btn-cerrar" id="logout-btn">Cerrar Sesión</a></li>
+                <li><a href="{% url 'account_logout' %}" class="enlace btn-cerrar" id="logout-btn">Cerrar Sesión</a></li>
             {% elif user.groups.first.name == "despachador" %}
                 <li><a href="{% url 'ver_pedidos_despachador' %}" class="enlace">Ver Productos</a></li>
                 <li><a href="{% url 'PERFIL_USUARIO' %}" class="enlace btn-ingresar">Mi Perfil</a></li>
-                <li><a href="{% url 'CERRAR_SESION' %}" class="enlace btn-cerrar" id="logout-btn">Cerrar Sesión</a></li>
+                <li><a href="{% url 'account_logout' %}" class="enlace btn-cerrar" id="logout-btn">Cerrar Sesión</a></li>
             {% else %}
                 <li><a href="{% url 'INDEX' %}" class="enlace">Inicio</a></li>
                 <li><a href="{% url 'PRODUCTOS' %}" class="enlace">Productos</a></li>
@@ -26,7 +26,7 @@
                 <li><a href="#sobre_nosotros" class="enlace">Sobre Nosotros</a></li>
                 <li><a href="{% url 'CARRITO' %}" class="enlace">Carrito</a></li>
                 <li><a href="{% url 'PERFIL_USUARIO' %}" class="enlace btn-ingresar">Mi Perfil</a></li>
-                <li><a href="{% url 'CERRAR_SESION' %}" class="enlace btn-cerrar" id="logout-btn">Cerrar Sesión</a></li>
+                <li><a href="{% url 'account_logout' %}" class="enlace btn-cerrar" id="logout-btn">Cerrar Sesión</a></li>
             {% endif %}
         {% else %}
             <li><a href="{% url 'INDEX' %}" class="enlace">Inicio</a></li>
@@ -217,23 +217,7 @@
         });
     });
 
-    document.getElementById('logout-btn').addEventListener('click', function(event) {
-            event.preventDefault();
-            Swal.fire({
-                title: '¿Estás seguro?',
-                text: "¿Quieres cerrar sesión?",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#d33',
-                cancelButtonColor: '#3085d6',
-                confirmButtonText: 'Sí, cerrar sesión',
-                cancelButtonText: 'Cancelar'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    window.location.href = "{% url 'account_logout' %}";
-                }
-            })
-        });
+
 
 </script>
 

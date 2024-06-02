@@ -33,6 +33,7 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     'django.contrib.sites',
+    
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -45,6 +46,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'crispy_forms',
     'crispy_bootstrap5',
+
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
@@ -163,7 +165,8 @@ EMAIL_HOST_USER = 'pardodev78@gmail.com'
 EMAIL_HOST_PASSWORD = 'yaor bbpi nyig ohsx'
 
 
-### CONEXION GOOGLE
+### CONEXION  Y CONFIGURACION ALLAUTH
+
 CRISPY_ALLOWED_TEMPLATE_PACKS = 'bootstrap5'
 CRISPY_TEMPLATE_PACK = 'bootstrap5'
 
@@ -200,4 +203,5 @@ ACCOUNT_UNIQUE_EMAIL = True
 
 ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
 ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS = 7
-    
+
+## FIN DE CONFIGURACION DE ALLAUTH

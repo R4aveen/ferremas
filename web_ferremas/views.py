@@ -261,6 +261,8 @@ def anular_pedido(request, pedido_id):
 # ============================================================================
 
 def webpay_plus_commit(request):
+
+
     if request.method == 'GET':
         payment_token = request.GET.get("token")
         if not payment_token:
@@ -271,6 +273,7 @@ def webpay_plus_commit(request):
             pedido = Pedido.objects.get(payment_token=payment_token, estado='pendiente de pago')
             user = pedido.usuario
             # Autenticar al usuario
+            user.backend = 'django.contrib.auth.backends.ModelBackend'  
             auth_login(request, user)
 
             token_ws = request.GET.get("token_ws")

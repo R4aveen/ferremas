@@ -34,7 +34,8 @@ class CarritoSerializer(serializers.ModelSerializer):
 class CarritoItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = CarritoItem
-        fields = '__all__'     
+        fields = '__all__'
+    
 
 class BoletaSerializer(serializers.ModelSerializer):
     class Meta:

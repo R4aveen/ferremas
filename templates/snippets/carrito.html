@@ -1,0 +1,66 @@
+{% load static %}
+{% block css %}
+
+
+<link rel="stylesheet" href="../../static/css/style.css">
+{% endblock css %}
+
+<header class="text-center my-4">
+    <h1>Hola!!! (<span>{{ user.username }}</span>)</h1>
+    <div class="cart-container position-relative d-inline-block">
+        <img src="https://img.icons8.com/?size=100&id=44052&format=png&color=000000" alt="Carrito" class="cart-icon" id="cartIcon">
+        <span class="cart-count badge bg-danger position-absolute top-0 start-100 translate-middle" id="cartCount">{{ carrito.length }}</span>
+        <div class="dropdown-menu p-3" aria-labelledby="cartIcon" id="cartDropdown">
+            <div id="cartItemsContainer">
+                {% for item in carrito %}
+                    <div class="dropdown-item">{{ item.cantidad }} x {{ item.producto.nombre }} - ${{ item.precio }}</div>
+                {% endfor %}
+            </div>
+            <div class="dropdown-divider"></div>
+            <p>Total: $<span id="cartTotal">0.00</span></p>
+            <a href="{% url 'CARRITO' %}" class="btn btn-primary btn-block">Ir al Carrito</a>
+        </div>
+    </div>
+</header>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var cartIcon = document.getElementById('cartIcon');
+        var cartCount = document.getElementById('cartCount');
+        var cartDropdown = document.getElementById('cartDropdown');
+        var cartItemsContainer = document.getElementById('cartItemsContainer');
+        var cartTotal = document.getElementById('cartTotal');
+
+        // Datos reales del carrito pasados desde el contexto Django
+        var carritoItems = {{ carrito|safe }};
+
+        function actualizarCarrito() {
+            // Limpiar el contenido actual
+            cartItemsContainer.innerHTML = '';
+            var total = 0;
+            var itemCount = 0;
+            carritoItems.forEach(function(item) {
+                var itemElement = document.createElement('div');
+                itemElement.classList.add('dropdown-item');
+                itemElement.textContent = `${item.cantidad} x ${item.producto.nombre} - $${item.precio}`;
+                cartItemsContainer.appendChild(itemElement);
+                total += parseFloat(item.precio);
+                itemCount += item.cantidad;
+            });
+            cartTotal.textContent = total.toFixed(2);
+            cartCount.textContent = itemCount;
+        }
+
+        // Mostrar/Ocultar el dropdown del carrito
+        cartIcon.addEventListener('click', function() {
+            if (cartDropdown.style.display === 'block') {
+                cartDropdown.style.display = 'none';
+            } else {
+                cartDropdown.style.display = 'block';
+            }
+        });
+
+        // Inicializar el carrito
+        actualizarCarrito();
+    });
+</script>

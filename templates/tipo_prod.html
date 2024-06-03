@@ -8,10 +8,9 @@
 
 <section class="container-sec">
     <div class="container">
-        <header class="text-center my-4">
-            <h1>Hola!!! (<span>{{ user.username }}</span>)</h1>
-        </header>
-        <nav class="filters text-center mb-4">
+        {% include 'snippets/carrito.html' %}
+
+        <nav class="filters d-flex justify-content-center mb-4">
             <div class=" d-inline-block">
                 <button href="{% url 'PRODUCTOS' %}" class="btn btn-primary mx-2" type="button" >
                     <a href="{% url 'PRODUCTOS' %}" style="color: #ccc; text-decoration: none;"> volver</a>

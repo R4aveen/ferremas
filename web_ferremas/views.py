@@ -23,7 +23,11 @@ from rest_framework import viewsets, status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 import uuid
+from rest_framework.permissions import IsAuthenticated
 
+class CarritoItemViewset(viewsets.ModelViewSet):
+    queryset = CarritoItem.objects.all()
+    serializer_class = CarritoItemSerializer
 
 # VIEWSETS
 class TipoProductoViewset(viewsets.ModelViewSet):
@@ -480,11 +484,13 @@ def productos(request):
     response_categorias = requests.get('http://127.0.0.1:8000/api/categorias_producto/')
     response_tipos = requests.get('http://127.0.0.1:8000/api/tipos_producto/')
     response_productos_oferta = requests.get('http://127.0.0.1:8000/api/producto_oferta/')
+    response_carrito_item = requests.get('http://127.0.0.1:8000/api/carrito_items/')
 
     data_productos = response_productos.json()
     data_categorias = response_categorias.json()
     data_tipos = response_tipos.json()
     data_productos_oferta = response_productos_oferta.json()
+    data_carrito = response_carrito_item.json()
 
     listado_productos = data_productos
     listado_categorias = data_categorias
@@ -497,13 +503,14 @@ def productos(request):
 
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
-
     ctx = {
         "page_obj": page_obj,
         "productos" : listado_productos,
         "categorias": listado_categorias,
         "ofertas" : listado_productos_oferta,
         "tipos": listado_tipos,
+        "carrito": data_carrito,
+
 
     }
     return render(request, 'productos.html', ctx)
@@ -929,291 +936,6 @@ def generar_pdf_transaccion(request, pedido_id):
     buffer.close()
     response.write(pdf)
     return response
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 ##### basti basti jsajajsa
 

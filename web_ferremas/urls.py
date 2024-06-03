@@ -11,6 +11,7 @@ router.register('carrito_compras', CarritoViewset)
 router.register('boletas', BoletaViewset)
 router.register('detalles_boletas', DetalleBoletaViewset)
 router.register('pedidos', PedidoViewset)
+router.register('carrito_items', CarritoItemViewset)
 
 urlpatterns = [
     path('base/', base, name='BASE'),

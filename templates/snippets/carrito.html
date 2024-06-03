@@ -7,16 +7,19 @@
 <header class="text-center my-4">
     <div class="row">
         <div class="col-8  justify-content center"  >        
-            <h1>Hola!!! (<span>{{ user.username }}</span>)</h1>
+            <h1 style="color: #a9f4a8;">Hola! 
+                <span style="color: #c04c04;">{{ user.username }}</span>
+                <p style="color: #a9f4a8;">que vas a comprar hoy?</p>
+            </h1>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-2">
             <div class="cart-container position-relative d-inline-block">
                 <img src="https://img.icons8.com/?size=100&id=44052&format=png&color=000000" alt="Carrito" class="cart-icon" id="cartIcon">
                 <span class="cart-count badge bg-danger position-absolute top-0 start-100 translate-middle" id="cartCount">{{ carrito.length }}</span>
                 <div class="dropdown-menu p-3" aria-labelledby="cartIcon" id="cartDropdown">
-                    <div id="cartItemsContainer">
+                    <div id="cartItemsContainer" style="background-color: #a9f4a8;">
                         {% for item in carrito %}
-                            <div class="dropdown-item">{{ item.cantidad }} x {{ item.producto.nombre }} - ${{ item.precio }}</div>
+                            <div class="dropdown-item" style="background-color: #a9f4a8;">{{ item.cantidad }} x {{ item.producto.nombre }} - ${{ item.precio }}</div>
                         {% endfor %}
                     </div>
                     <div class="dropdown-divider"></div>

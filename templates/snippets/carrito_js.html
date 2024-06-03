@@ -6,25 +6,25 @@
 
 <header class="text-center my-4">
     <div class="row">
-        <div class="col-8  justify-content center"  >        
-            <h1 style="color: #a9f4a8;">Hola! 
-                <span style="color: #c04c04;">{{ user.username }}</span>
-                <p style="color: #a9f4a8;">que vas a comprar hoy?</p>
+        <div class="col-8 justify-content center"  >        
+            <h1 style="color: #d8f4d8;">Hola! 
+                <span style="color: #c0e9bf;">{{ user.username }}</span>
+
             </h1>
         </div>
         <div class="col-md-2">
             <div class="cart-container position-relative d-inline-block">
                 <img src="https://img.icons8.com/?size=100&id=44052&format=png&color=000000" alt="Carrito" class="cart-icon" id="cartIcon">
                 <span class="cart-count badge bg-danger position-absolute top-0 start-100 translate-middle" id="cartCount">{{ carrito.length }}</span>
-                <div class="dropdown-menu p-3" aria-labelledby="cartIcon" id="cartDropdown">
-                    <div id="cartItemsContainer" style="background-color: #a9f4a8;">
+                <div class="dropdown-menu p-3 fondo" aria-labelledby="cartIcon" id="cartDropdown" >
+                    <div class="cartItemsContainerr" id="cartItemsContainer" >
                         {% for item in carrito %}
-                            <div class="dropdown-item" style="background-color: #a9f4a8;">{{ item.cantidad }} x {{ item.producto.nombre }} - ${{ item.precio }}</div>
+                            <div class="dropdown-item" >{{ item.cantidad }} x {{ item.producto.nombre }} - ${{ item.precio }}</div>
                         {% endfor %}
                     </div>
                     <div class="dropdown-divider"></div>
                     <p>Total: $<span id="cartTotal">0.00</span></p>
-                    <a href="{% url 'CARRITO' %}" class="btn btn-primary btn-block">Ir al Carrito</a>
+                    <a href="{% url 'CARRITO' %}" class="btns btn-primary btn-block">Ir al Carrito</a>
                 </div>
             </div>
         </div>
@@ -35,6 +35,50 @@
 
 
 <style>
+    h1{
+        font-size: 2.5rem;
+        font-weight: bold;
+        color: #333;
+        font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    }
+    .cartItemsContainerr{
+        background-color: #dfe9df;
+    }
+    .cartItemsContainerr:hover{
+        background-color: #c9e8c9;
+    }
+    .dropdown-item{
+        background-color: #dfe9df !important;
+    }
+    .dropdown-item:hover{
+        background-color: #c9e8c9 !important;
+    }
+    .fondo{
+        background-color: #dfe9df;
+        border: 2px solid #016501;
+        
+    }
+    .fondo:hover{
+        background-color: #c9e8c9;
+    }
+    .btns{
+        background-color: #e95600;
+        color: white;
+        border-radius: 15px;
+        text-decoration: none;
+        max-width: max-content;
+        max-height: max-content;
+        padding: 0.5rem 1rem;
+    }
+    .btns:hover{
+        background-color: black;
+        color: white;
+        border-radius: 15px;
+        text-decoration: none;
+        max-width: max-content;
+        max-height: max-content;
+        padding: 0.5rem 1rem;
+    }
     .orden{
         display: flex;
         flex-direction: row;
@@ -85,6 +129,7 @@
     }
     .cart-container {
     cursor: pointer;
+    
 }
 
 .cart-icon {

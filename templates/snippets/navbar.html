@@ -2,13 +2,14 @@
 <nav>
     <div class="menu-container">
         <div class="menu-icon" id="menu-icon" onclick="toggleMenu()">☰</div>
-        <a href="{% url 'INDEX' %}" class="logo-link"><img src="{% static 'img/logo.png' %}" alt="Logo" class="logo"></a>
     </div>
-    <ul class="menu" id="menu">
+    
+    <ul class="menu" id="menu">        
+        <a href="{% url 'INDEX' %}" class="logo-link"><img src="{% static 'img/OsosMaduros.png' %}" alt="Logo" class="logo" style="width: fit-content;"></a>
         {% if user.is_authenticated %}
             {%  if user.groups.first.name == "vendedor" %}   
                 <li><a href="{% url 'ver_productos' %}" class="enlace">Ver Productos</a></li>
-                <li><a href="{% url 'GESTIONAR_PEDIDOS' %}" class="enlace">Gestionar Pedidos</a></li>
+                <li><a href="{% url 'GESTIONAR_PEDIDOS' %}" class="enlace ">Gestionar Pedidos</a></li>
                 <li><a href="{% url 'PERFIL_USUARIO' %}" class="enlace btn-ingresar">Mi Perfil</a></li>
                 <li><a href="{% url 'account_logout' %}" class="enlace btn-cerrar" id="logout-btn">Cerrar Sesión</a></li>
             {% elif user.groups.first.name == "bodeguero" %}
@@ -29,7 +30,7 @@
                 <li><a href="{% url 'account_logout' %}" class="enlace btn-cerrar" id="logout-btn">Cerrar Sesión</a></li>
             {% endif %}
         {% else %}
-            <li><a href="{% url 'INDEX' %}" class="enlace">Inicio</a></li>
+            <li><a href="{% url 'INDEX' %}" class="enlace {% if request.path == '' %}active{% endif %}">Inicio</a></li>
             <li><a href="{% url 'PRODUCTOS' %}" class="enlace">Productos</a></li>
             <li><a href="#categorias" class="enlace">Categorías</a></li>
             <li><a href="#sobre_nosotros" class="enlace">Sobre Nosotros</a></li>
@@ -138,7 +139,9 @@
         color: rgb(34, 33, 33);
         text-decoration: none;
     }
-
+    .menu-container{
+        display: none;
+    }
 
     @media only screen and (max-width: 1110px) {
         .menu {
@@ -157,7 +160,10 @@
     }
 
         .menu.visible {
-            display: flex;
+            display: hidden;
+        }
+        ul.menu{
+            display: flow-root;
         }
 
         .menu li {
@@ -171,6 +177,13 @@
             margin: 10px 0;
             padding: 10px;
             width: 100%;
+            text-align: left;
+        }
+
+
+        .enlace:hover {
+            background: linear-gradient(to right, rgb(70, 70, 70), transparent);
+            color: white;
         }
 
         .logo {
@@ -179,6 +192,7 @@
         }
 
         .menu-container {
+            display: flex;
             justify-content: space-between;
             width: 100%;
         }
@@ -189,6 +203,9 @@
 
         .logo-link {
             margin-right: 20px;
+        }
+        nav{
+            display: flex;
         }
     }
 </style>
@@ -205,7 +222,7 @@
     menuIcon.addEventListener('click', function() {
         var menuItems = document.querySelectorAll('.enlace, .btn-ingresar, .btn-cerrar');
         menuItems.forEach(function(item) {
-            item.classList.toggle('visible');
+            item.classList.toggle('hidden');
         });
     });
 

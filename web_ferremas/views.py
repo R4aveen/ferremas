@@ -496,7 +496,7 @@ def productos(request):
     listado_categorias = data_categorias
     listado_tipos = data_tipos
     listado_productos_oferta = data_productos_oferta
-
+    
 
 
     paginator = Paginator(listado_productos, 6) 
@@ -516,6 +516,11 @@ def productos(request):
     return render(request, 'productos.html', ctx)
 
 def categoriaprod(request, categoriaprod_id):
+
+    response_carrito_item = requests.get('http://127.0.0.1:8000/api/carrito_items/')
+
+    data_carrito = response_carrito_item.json()
+
     categoria = get_object_or_404(CategoriaProducto, id=categoriaprod_id)
     categorias_list = CategoriaProducto.objects.all()
 
@@ -532,12 +537,18 @@ def categoriaprod(request, categoriaprod_id):
         "categoria": categoria,
         "categorias": categorias_list,
         "tipos": tipos_list,
+        "carrito": data_carrito,
 
 
     }
     return render(request, "categoria_prod.html", ctx)
 
 def tipoprod(request, tipoprod_id):
+
+    response_carrito_item = requests.get('http://127.0.0.1:8000/api/carrito_items/')
+   
+    data_carrito = response_carrito_item.json()
+
     tipo = get_object_or_404(TipoProducto, id=tipoprod_id)
     tipos_list = TipoProducto.objects.all()
 
@@ -554,6 +565,7 @@ def tipoprod(request, tipoprod_id):
         "tipo": tipo,
         "tipos": tipos_list,
         "categorias": categorias_list,
+        "carrito": data_carrito,
 
 
     }

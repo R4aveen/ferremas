@@ -5,7 +5,7 @@
     </div>
     
     <ul class="menu" id="menu">        
-        <a href="{% url 'INDEX' %}" class="logo-link"><img src="{% static 'img/OsosMaduros.png' %}" alt="Logo" class="logo" style="width: fit-content;"></a>
+        <a href="{% url 'INDEX' %}" class="logo-link"><img src="{% static 'img/OsosMaduros.png' %}" alt="Logo" class="logo" "></a>
         {% if user.is_authenticated %}
             {%  if user.groups.first.name == "vendedor" %}   
                 <li><a href="{% url 'ver_productos' %}" class="enlace">Ver Productos</a></li>

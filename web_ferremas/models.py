@@ -2,11 +2,16 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
 import uuid
+from django.core.exceptions import ValidationError
 
 # Create your models here.
 class CategoriaProducto(models.Model):
     id = models.AutoField(primary_key=True, auto_created=True)
-    categoria = models.CharField(max_length=30, null=False)
+    categoria = models.CharField(max_length=30,blank=False, null=False)
+
+    def clean(self):
+        if not self.categoria:
+            raise ValidationError('El campo "categoria" no puede estar vacío.')
 
     def __str__(self):
         return self.categoria
@@ -17,6 +22,10 @@ class TipoProducto(models.Model):
 
     def __str__(self):
         return self.tipo
+    
+    def clean(self):
+        if not self.tipo:
+            raise ValidationError('El campo "tipo" no puede estar vacío.')
     
 class Producto(models.Model):
     id = models.AutoField(primary_key=True, auto_created=True)
@@ -32,12 +41,24 @@ class Producto(models.Model):
     def __str__(self):
         return self.nombre
     
+    def clean(self):
+        if not self.nombre:
+            raise ValidationError('El campo "nombre" no puede estar vacío.')
+        if self.precio <= 0:
+            raise ValidationError('El precio debe ser mayor que cero.')
+        if self.stock < 0:
+            raise ValidationError('El stock no puede ser negativo.')
+    
 class ProductoOferta(models.Model):
     producto = models.OneToOneField(Producto, primary_key=True, on_delete=models.CASCADE)
     precio_oferta = models.IntegerField(default=0)
 
     def __str__(self):
         return f"{self.producto.nombre} - Precio de oferta: {self.precio_oferta}"
+    
+    def clean(self):
+        if not self.producto:
+            raise ValidationError('Debe especificar un producto para crear una oferta.')
     
 class Carrito(models.Model):
     usuario = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -47,6 +68,11 @@ class Carrito(models.Model):
     def __str__(self):
         return f"{self.usuario} - {self.creado_en}"
     
+    def clean(self):
+        if not self.usuario:
+            raise ValidationError('Debe especificar un usuario para crear un carrito.')
+            
+    
 class CarritoItem(models.Model):
     carrito = models.ForeignKey(Carrito, on_delete=models.CASCADE)
     producto = models.ForeignKey(Producto, on_delete=models.CASCADE)
@@ -55,6 +81,16 @@ class CarritoItem(models.Model):
 
     def precio_total(self):
         return self.cantidad * self.precio
+    
+    def clean(self):
+        if not self.carrito:
+            raise ValidationError('Debe especificar un carrito para crear un carrito item.')
+        if not self.producto:
+            raise ValidationError('Debe especificar un producto para crear un carrito item.')
+        if self.cantidad <= 0:
+            raise ValidationError('La cantidad debe ser mayor que cero para crear un carrito item.')
+        if self.precio <= 0:
+            raise ValidationError('El precio debe ser mayor que cero para crear un carrito item.')
     
 class Pedido(models.Model):
     ESTADO_PEDIDO = [

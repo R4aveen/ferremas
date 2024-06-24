@@ -953,13 +953,25 @@ def generar_pdf_transaccion(request, pedido_id):
 
 
 import random
+from .forms import *
 
 def index(request):
     productos_oferta = Producto.objects.filter(en_oferta=True).order_by('?')[:3]
     categorias_random = CategoriaProducto.objects.order_by('?')[:3]
+    contacto = ContactoForm()
     
     ctx = {
         'productos_oferta': productos_oferta,
         'categorias_random': categorias_random,
+        'form' : ContactoForm()
     }
+
+    if request.method == 'POST':
+        formulario = ContactoForm(data=request.POST)
+        if formulario.is_valid():
+            formulario.save()
+            messages.success(request, "Mensaje enviado correctamente!")
+            return redirect(to="INDEX")
+        else:
+            ctx["form"] = formulario
     return render(request, 'index.html', ctx)

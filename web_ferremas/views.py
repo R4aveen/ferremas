@@ -949,7 +949,7 @@ def generar_pdf_transaccion(request, pedido_id):
     response.write(pdf)
     return response
 
-##### basti basti jsajajsa
+##### PardoDev JAJAJA
 
 
 import random

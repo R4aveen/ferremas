@@ -142,7 +142,7 @@
         <div class="row justify-content-center">
             <div class="col-md-8" style="color: white;">
                 <h2 class="text-center mb-4">Contactanos</h2>
-                <form action="" method="POST">
+                <form action="" method="POST" id="contact-form">
                     {% csrf_token %}
                     {{ form  }}
                     <div class="d-grid">
@@ -153,6 +153,25 @@
         </div>
     </div>
 </div>
+
+<script>
+    $(document).ready(function () {
+        $("#contact-form").validate({
+            rules: {
+                name: {
+                    required: true,  
+                    minlength: 2    
+                }
+            },
+            messages: {
+                name: {
+                    required: "Por favor ingrese su nombre",  // Mensaje para la regla 'required'
+                    minlength: "El nombre debe tener al menos 2 caracteres"  // Mensaje para la regla 'minlength'
+                }
+            }
+        });
+    });
+</script>
 
 
 

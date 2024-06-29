@@ -1,348 +1,345 @@
-import pytest
+from django.test import TestCase
+from django.core.exceptions import ValidationError
 from .models import *
-from .forms import *
-from django.db import IntegrityError
 from django.contrib.auth.models import User
-# =======================================================================
-# CATEGORIA
-# =======================================================================
-@pytest.mark.django_db
-def test_crear_categoria_producto():
-    categoria_producto = CategoriaProducto.objects.create(
-        categoria="Gasfiteria"
-    )
-    assert categoria_producto.categoria == "Gasfiteria"
-    assert str(categoria_producto) == "Gasfiteria"
 
-# TESTING ERROR
-@pytest.mark.django_db
-def test_crear_categoria_producto_con_categoria_vacia():
-    with pytest.raises(ValidationError):
-        categoria_producto = CategoriaProducto(categoria="")
-        categoria_producto.full_clean()
+class TestCategoria(TestCase):
+    def test_crear(self):
+        categoria = CategoriaProducto.objects.create(categoria='Gasfiteria')
+        self.assertEqual(categoria.categoria, 'Gasfiteria')
 
-# =======================================================================
-# TIPO CATEGORIA
-# =======================================================================
-@pytest.mark.django_db
-def test_crear_tipo_producto():
-    tipo_producto = TipoProducto.objects.create(
-        tipo = "Lubricante"
-    )
-    assert tipo_producto.tipo == "Lubricante"
-    assert str(tipo_producto) == "Lubricante"
+    def test_sin_nombre(self):
+        categoria = CategoriaProducto(categoria='')
+        with self.assertRaises(ValidationError) as context:
+            categoria.full_clean()
+        self.assertIn('El campo categoria no puede estar vacío.', str(context.exception))
 
-# TIPO CATEGORIA SIN CATEGORIA
-@pytest.mark.django_db
-def test_crear_categoria_producto_con_categoria_vacia():
-    with pytest.raises(ValidationError):
-        categoria_producto = CategoriaProducto(categoria="")
-        categoria_producto.full_clean()
+    def test_nombre_corto(self):
+        categoria = CategoriaProducto(categoria='Ga')
+        with self.assertRaises(ValidationError) as context:
+            categoria.full_clean()
+        self.assertIn('El nombre de categoria debe tener al menos 3 caracteres.', str(context.exception))
 
-# =======================================================================
-# CREAR PRODUCTO
-# =======================================================================
+    def test_nombre_largo(self):
+        categoria = CategoriaProducto(categoria='Gasfiteria del primer mundo!')
+        with self.assertRaises(ValidationError) as context:
+            categoria.full_clean()
+        self.assertIn('El nombre de categoria no puede tener más de 25 caracteres.', str(context.exception))
 
-@pytest.mark.django_db
-def test_crear_producto():
-    categoria_producto = CategoriaProducto.objects.create(
-        categoria="Gasfiteria"
-    )
-    tipo_producto = TipoProducto.objects.create(
-        tipo = "Lubricante"
-    )
+class TestTipo(TestCase):
+    def test_crear(self):
+        tipo = TipoProducto.objects.create(tipo='Herramientas de corte')
+        self.assertEqual(tipo.tipo, 'Herramientas de corte')
 
-    producto = Producto.objects.create(
-        nombre = "Cierra electrica",
-        precio = 5990,
-        stock = 55,
-        descripcion = "Cierra de buena calidad",
-        en_oferta = False
-    )
-    producto.categoria.set({categoria_producto})
-    producto.tipo.set({tipo_producto})
-    assert producto.nombre == "Cierra electrica"
-    assert producto.precio == 5990
-    assert producto.stock == 55
-    assert producto.descripcion == "Cierra de buena calidad"
-    assert categoria_producto in producto.categoria.all()
-    assert tipo_producto in producto.tipo.all()
-    assert producto.en_oferta == False
+    def test_sin_nombre(self):
+        tipo = TipoProducto(tipo='')
+        with self.assertRaises(ValidationError) as context:
+            tipo.full_clean()
+        self.assertIn('El campo tipo no puede estar vacío.', str(context.exception))
 
-    assert str(producto) == "Cierra electrica"
+    def test_nombre_corto(self):
+        tipo = TipoProducto(tipo='He')
+        with self.assertRaises(ValidationError) as context:
+            tipo.full_clean()
+        self.assertIn('El nombre de tipo debe tener al menos 3 caracteres.', str(context.exception))
 
-# TEST PRODUCTO SIN NOMBRE,PRECIO NEGATIVO Y STOCK NEGATIVO
-@pytest.mark.django_db
-def test_crear_producto_sin_nombre_precio_stock():
-    categoria_producto = CategoriaProducto.objects.create(
-        categoria="Gasfiteria"
-    )
-    tipo_producto = TipoProducto.objects.create(
-        tipo="Lubricante"
-    )
+    def test_nombre_largo(self):
+        tipo = TipoProducto(tipo='Herramientas de cortes de metales especiales')
+        with self.assertRaises(ValidationError) as context:
+            tipo.full_clean()
+        self.assertIn('El nombre de tipo no puede tener más de 25 caracteres.', str(context.exception))
 
-    with pytest.raises(ValidationError):
+class TestProducto(TestCase):
+    def test_crear(self):
+        categoria = CategoriaProducto.objects.create(categoria='Herramientas')
+        tipo = TipoProducto.objects.create(tipo='Manual')
+
         producto = Producto.objects.create(
-            descripcion="Cierra de buena calidad",
+            nombre='Martillo',
+            precio=9990,
+            stock=50,
+            descripcion='Breve Descripcion del producto',
             en_oferta=False
         )
-        producto.categoria.set([categoria_producto])
-        producto.tipo.set([tipo_producto])
-        producto.full_clean()
 
-# =======================================================================
-# TEST CREAR OFERTA
-# =======================================================================
-@pytest.mark.django_db
-def test_crear_oferta():
-    categoria_producto = CategoriaProducto.objects.create(
-        categoria="Gasfiteria"
-    )
-    tipo_producto = TipoProducto.objects.create(
-        tipo = "Lubricante"
-    )
+        producto.categoria.add(categoria)
+        producto.tipo.add(tipo)
 
-    productos = Producto.objects.create(
-        nombre = "Cierra electrica",
-        precio = 5990,
-        stock = 55,
-        descripcion = "Cierra de buena calidad",
-        en_oferta = False
-    )
-    productos.categoria.set({categoria_producto})
-    productos.tipo.set({tipo_producto})
+        self.assertEqual(producto.nombre, 'Martillo')
+        self.assertEqual(producto.precio, 9990)
+        self.assertEqual(producto.stock, 50)
+        self.assertEqual(producto.descripcion, 'Breve Descripcion del producto')
+        self.assertFalse(producto.en_oferta)
+        self.assertIn(categoria, producto.categoria.all())
+        self.assertIn(tipo, producto.tipo.all())
 
-    oferta = ProductoOferta.objects.create(
-        producto = productos,
-        precio_oferta = 10990
-    )
+    def test_sin_nombre(self):
+        categoria = CategoriaProducto.objects.create(categoria='Herramientas')
+        tipo = TipoProducto.objects.create(tipo='Manual')
 
-    
-    assert productos.nombre == "Cierra electrica"
-    assert productos.precio == 5990
-    assert productos.stock == 55
-    assert productos.descripcion == "Cierra de buena calidad"
-    assert categoria_producto in productos.categoria.all()
-    assert tipo_producto in productos.tipo.all()
-    assert productos.en_oferta == False
+        producto = Producto(
+            nombre='',
+            precio=9990,
+            stock=50,
+            descripcion='Breve Descripcion del producto',
+            en_oferta=False
+        )
+        producto.save()
+        producto.categoria.add(categoria)
+        producto.tipo.add(tipo)
 
-    assert oferta.producto == productos
-    assert oferta.precio_oferta == 10990
-    assert oferta.producto.nombre == "Cierra electrica"
+        with self.assertRaises(ValidationError) as context:
+            producto.full_clean()
+        self.assertIn('El campo "nombre" no puede estar vacío.', str(context.exception))
 
-# TEST CREAR OFERTA SIN PRODUCTO
-@pytest.mark.django_db
-def test_crear_oferta_sin_producto():
-    with pytest.raises(ValidationError):
-        ProductoOferta.objects.create(
-            precio_oferta=10990
+    def test_precio_invalido(self):
+        categoria = CategoriaProducto.objects.create(categoria='Herramientas')
+        tipo = TipoProducto.objects.create(tipo='Manual')
+
+        producto = Producto(
+            nombre='Martillo',
+            precio=0,
+            stock=50,
+            descripcion='Breve Descripcion del producto',
+            en_oferta=False
+        )
+        producto.save()
+        producto.categoria.add(categoria)
+        producto.tipo.add(tipo)
+
+        with self.assertRaises(ValidationError) as context:
+            producto.full_clean()
+        self.assertIn('El precio debe ser mayor que cero.', str(context.exception))
+
+    def test_sin_categoria(self):
+        tipo = TipoProducto.objects.create(tipo='Manual')
+
+        producto = Producto(
+            nombre='Martillo',
+            precio=9990,
+            stock=50,
+            descripcion='Breve Descripcion del producto',
+            en_oferta=False
+        )
+        producto.save()
+        producto.tipo.add(tipo)
+
+        with self.assertRaises(ValidationError) as context:
+            producto.full_clean()
+        self.assertIn('El campo "categoria" no puede estar vacio.', str(context.exception))
+
+    def test_sin_tipo(self):
+        categoria = CategoriaProducto.objects.create(categoria='Herramientas')
+
+        producto = Producto(
+            nombre='Martillo',
+            precio=9990,
+            stock=50,
+            descripcion='Breve Descripcion del producto',
+            en_oferta=False
+        )
+        producto.save()
+        producto.categoria.add(categoria)
+
+        with self.assertRaises(ValidationError) as context:
+            producto.full_clean()
+        self.assertIn('El campo "tipo" no puede estar vacio.', str(context.exception))
+
+class TestOfertaProducto(TestCase):
+    def test_crear(self):
+        categoria = CategoriaProducto.objects.create(categoria='Herramientas')
+        tipo = TipoProducto.objects.create(tipo='Manual')
+
+        producto = Producto.objects.create(
+            nombre='Martillo',
+            precio=9990,
+            stock=50,
+            descripcion='Breve Descripcion del producto',
+            en_oferta=True
+        )
+        producto.categoria.add(categoria)
+        producto.tipo.add(tipo)
+
+        oferta = ProductoOferta.objects.create(
+            producto=producto,
+            precio_oferta=7990
         )
 
-# =======================================================================
-# TEST CREAR CARRITO
-# =======================================================================
-    
-@pytest.mark.django_db
-def test_crear_carrito():
-    usuario = User.objects.create_user(username='testuser', password='12345')
-    carrito = Carrito.objects.create(usuario=usuario)
-    
-    assert carrito.usuario == usuario
-    assert carrito.pedido_aprobado == False
-    assert str(carrito) == f"{usuario} - {carrito.creado_en}"
+        self.assertEqual(oferta.producto.nombre, 'Martillo')
+        self.assertEqual(oferta.precio_oferta, 7990)
 
-@pytest.mark.django_db
-def test_crear_carrito_sin_usuario():
-    with pytest.raises(ValidationError):
-        Carrito.objects.create(pedido_aprobado=False)
+    def test_precio_oferta_invalido(self):
+        categoria = CategoriaProducto.objects.create(categoria='Herramientas')
+        tipo = TipoProducto.objects.create(tipo='Manual')
 
-# =======================================================================
-# TEST CREAR CARRITO ITEM
-# =======================================================================
+        producto = Producto.objects.create(
+            nombre='Martillo',
+            precio=9990,
+            stock=50,
+            descripcion='Breve Descripcion del producto',
+            en_oferta=True
+        )
+        producto.categoria.add(categoria)
+        producto.tipo.add(tipo)
 
-@pytest.mark.django_db
-def test_crear_carrito_item():
-    usuario = User.objects.create_user(username='testuser', password='12345')
-    categoria_producto = CategoriaProducto.objects.create(categoria="Gasfiteria")
-    tipo_producto = TipoProducto.objects.create(tipo="Lubricante")
-    producto = Producto.objects.create(nombre="Cierra electrica", precio=5990, stock=55, descripcion="Cierra de buena calidad")
-    producto.categoria.set([categoria_producto])
-    producto.tipo.set([tipo_producto])
-    carrito = Carrito.objects.create(usuario=usuario)
-    carrito_item = CarritoItem.objects.create(carrito=carrito, producto=producto, cantidad=2, precio=5990)
-    
-    assert carrito_item.carrito == carrito
-    assert carrito_item.producto == producto
-    assert carrito_item.cantidad == 2
-    assert carrito_item.precio == 5990
-    assert carrito_item.precio_total() == 2 * 5990
+        oferta = ProductoOferta(
+            producto=producto,
+            precio_oferta=-2
+        )
 
-# SIN ESPECIICAR NINGUN CAMPO; SIN ESPECIGICAR CANTIDAD Y PRECIO
-@pytest.mark.django_db
-def test_crear_carrito_item_sin_campos():
-    usuario = User.objects.create_user(username='testuser', password='12345')
-    categoria_producto = CategoriaProducto.objects.create(categoria="Gasfiteria")
-    tipo_producto = TipoProducto.objects.create(tipo="Lubricante")
-    producto = Producto.objects.create(nombre="Cierra electrica", precio=5990, stock=55, descripcion="Cierra de buena calidad")
-    producto.categoria.set([categoria_producto])
-    producto.tipo.set([tipo_producto])
-    carrito = Carrito.objects.create(usuario=usuario)
-    
-    # Intentamos crear un CarritoItem sin especificar todos los campos requeridos
-    with pytest.raises(ValidationError):
-        CarritoItem.objects.create(carrito=carrito, producto=producto, cantidad=2, precio=5990)
+        with self.assertRaises(ValidationError) as context:
+            oferta.full_clean()
 
-    # Intentamos crear un CarritoItem sin especificar la cantidad
-    with pytest.raises(ValidationError):
-        CarritoItem.objects.create(carrito=carrito, producto=producto, precio=5990)
-
-    # Intentamos crear un CarritoItem sin especificar el precio
-    with pytest.raises(ValidationError):
-        CarritoItem.objects.create(carrito=carrito, producto=producto, cantidad=2)
-
-# =======================================================================
-# TEST CREAR PEDIDO
-# =======================================================================
-
-@pytest.mark.django_db
-def test_crear_pedido():
-    usuario = User.objects.create_user(username='testuser', password='12345')
-    carrito = Carrito.objects.create(usuario=usuario)
-    pedido = Pedido.objects.create(usuario=usuario, carrito=carrito, direccion_envio="123 Main St", metodo_pago="Tarjeta")
-
-    assert pedido.usuario == usuario
-    assert pedido.carrito == carrito
-    assert pedido.estado == 'pendiente'
-    assert pedido.direccion_envio == "123 Main St"
-    assert pedido.metodo_pago == "Tarjeta"
-    assert str(pedido) == f"Pedido {pedido.id} - {usuario} - pendiente"
-
-# Crear pedidos sin campos
-def test_crear_pedido_sin_campos():
-    usuario = User.objects.create_user(username='testuser', password='12345')
-    carrito = Carrito.objects.create(usuario=usuario)
-    
-    # Intentamos crear un Pedido sin especificar la dirección de envío y método de pago
-    with pytest.raises(ValidationError):
-        Pedido.objects.create(usuario=usuario, carrito=carrito)
-
-# =======================================================================
-# TEST CREAR DETALLE PEDIDO 
-# =======================================================================
-@pytest.mark.django_db
-def test_crear_detalle_pedido():
-    usuario = User.objects.create_user(username='testuser', password='12345')
-    categoria_producto = CategoriaProducto.objects.create(categoria="Gasfiteria")
-    tipo_producto = TipoProducto.objects.create(tipo="Lubricante")
-    producto = Producto.objects.create(nombre="Cierra electrica", precio=5990, stock=55, descripcion="Cierra de buena calidad")
-    producto.categoria.set([categoria_producto])
-    producto.tipo.set([tipo_producto])
-    carrito = Carrito.objects.create(usuario=usuario)
-    pedido = Pedido.objects.create(usuario=usuario, carrito=carrito, direccion_envio="123 Main St", metodo_pago="Tarjeta")
-    detalle_pedido = DetallePedido.objects.create(pedido=pedido, producto=producto, cantidad=2, precio=5990, subtotal=2*5990)
-    
-    assert detalle_pedido.pedido == pedido
-    assert detalle_pedido.producto == producto
-    assert detalle_pedido.cantidad == 2
-    assert detalle_pedido.precio == 5990
-    assert detalle_pedido.subtotal == 2 * 5990
-    assert str(detalle_pedido) == f"Pedido {pedido.id} - Producto {producto.nombre} - Cantidad {detalle_pedido.cantidad}"
-
-# TEST CREAR DETALLE PEDIDO SIN CAMPOS
-@pytest.mark.django_db
-def test_crear_detalle_pedido_sin_campos():
-    usuario = User.objects.create_user(username='testuser', password='12345')
-    categoria_producto = CategoriaProducto.objects.create(categoria="Gasfiteria")
-    tipo_producto = TipoProducto.objects.create(tipo="Lubricante")
-    producto = Producto.objects.create(nombre="Cierra electrica", precio=5990, stock=55, descripcion="Cierra de buena calidad")
-    producto.categoria.set([categoria_producto])
-    producto.tipo.set([tipo_producto])
-    carrito = Carrito.objects.create(usuario=usuario)
-    pedido = Pedido.objects.create(usuario=usuario, carrito=carrito, direccion_envio="123 Main St", metodo_pago="Tarjeta")
-    
-    # Intentamos crear un DetallePedido sin especificar el precio y subtotal
-    with pytest.raises(ValidationError):
-        DetallePedido.objects.create(pedido=pedido, producto=producto, cantidad=2)
-
-# =======================================================================
-# TEST CREAR BOLETA
-# =======================================================================
-@pytest.mark.django_db
-def test_crear_boleta():
-    usuario = User.objects.create_user(username='testuser', password='12345')
-    boleta = Boleta.objects.create(usuario=usuario, total=11980)
-
-    assert boleta.usuario == usuario
-    assert boleta.total == 11980
-    assert str(boleta.usuario) == 'testuser'
-
-# TEST CREAR BOLETA SIN CAMPOS
-@pytest.mark.django_db
-def test_crear_boleta_sin_campos():
-    usuario = User.objects.create_user(username='testuser', password='12345')
-    
-    # Intentamos crear una Boleta sin especificar el total
-    with pytest.raises(ValidationError):
-        Boleta.objects.create(usuario=usuario)
+        self.assertIn('El precio oferta no puede ser negativo.', str(context.exception))
 
 
-# =======================================================================
-# TEST CREAR DETALLE BOLETA
-# =======================================================================
-@pytest.mark.django_db
-def test_crear_detalle_boleta():
-    usuario = User.objects.create_user(username='testuser', password='12345')
-    categoria_producto = CategoriaProducto.objects.create(categoria="Gasfiteria")
-    tipo_producto = TipoProducto.objects.create(tipo="Lubricante")
-    producto = Producto.objects.create(nombre="Cierra electrica", precio=5990, stock=55, descripcion="Cierra de buena calidad")
-    producto.categoria.set([categoria_producto])
-    producto.tipo.set([tipo_producto])
-    boleta = Boleta.objects.create(usuario=usuario, total=11980)
-    detalle_boleta = DetalleBoleta.objects.create(boleta=boleta, producto=producto, cantidad=2, subtotal=11980)
+class TestCarrito(TestCase):
+    def test_crear_carrito(self):
+        usuario = User.objects.create_user(username='testuser', password='12345')
+        carrito = Carrito.objects.create(usuario=usuario)
+        self.assertEqual(carrito.usuario.username, 'testuser')
 
-    assert detalle_boleta.boleta == boleta
-    assert detalle_boleta.producto == producto
-    assert detalle_boleta.cantidad == 2
-    assert detalle_boleta.subtotal == 11980
+    def test_sin_usuario(self):
+        carrito = Carrito()
+        with self.assertRaises(ValidationError) as context:
+            carrito.full_clean()
+        self.assertIn('Debe especificar un usuario para crear un carrito.', str(context.exception))
 
-# TEST CREAR DETALLE BOLETA SIN CAMPOS
-@pytest.mark.django_db
-def test_crear_detalle_boleta_sin_campos():
-    usuario = User.objects.create_user(username='testuser', password='12345')
-    categoria_producto = CategoriaProducto.objects.create(categoria="Gasfiteria")
-    tipo_producto = TipoProducto.objects.create(tipo="Lubricante")
-    producto = Producto.objects.create(nombre="Cierra electrica", precio=5990, stock=55, descripcion="Cierra de buena calidad")
-    producto.categoria.set([categoria_producto])
-    producto.tipo.set([tipo_producto])
-    boleta = Boleta.objects.create(usuario=usuario, total=11980)
-    
-    # Intentamos crear un DetalleBoleta sin especificar la cantidad
-    with pytest.raises(ValidationError):
-        DetalleBoleta.objects.create(boleta=boleta, producto=producto, subtotal=11980)
+class TestCarritoItem(TestCase):
+    def test_crear_carrito_item(self):
+        usuario = User.objects.create_user(username='testuser', password='12345')
+        carrito = Carrito.objects.create(usuario=usuario)
+        categoria = CategoriaProducto.objects.create(categoria='Herramientas')
+        tipo = TipoProducto.objects.create(tipo='Manual')
+        producto = Producto.objects.create(
+            nombre='Martillo',
+            precio=9990,
+            stock=50,
+            descripcion='Breve Descripcion del producto',
+            en_oferta=False
+        )
+        producto.categoria.add(categoria)
+        producto.tipo.add(tipo)
+        carrito_item = CarritoItem.objects.create(carrito=carrito, producto=producto, cantidad=1, precio=9990)
+        self.assertEqual(carrito_item.carrito.usuario.username, 'testuser')
 
-# =======================================================================
-# TEST CREAR FORMULARIO DE CONTACTO
-# =======================================================================
-@pytest.mark.django_db
-def test_form_contacto():
+    def test_sin_carrito(self):
+        categoria = CategoriaProducto.objects.create(categoria='Herramientas')
+        tipo = TipoProducto.objects.create(tipo='Manual')
+        producto = Producto.objects.create(
+            nombre='Martillo',
+            precio=9990,
+            stock=50,
+            descripcion='Breve Descripcion del producto',
+            en_oferta=False
+        )
+        producto.categoria.add(categoria)
+        producto.tipo.add(tipo)
+        carrito_item = CarritoItem(producto=producto, cantidad=1, precio=9990)
+        with self.assertRaises(ValidationError) as context:
+            carrito_item.full_clean()
+        self.assertIn('Debe especificar un carrito para crear un carrito item.', str(context.exception))
 
-    data = {
-        "nombre" : "Carlos Pardo Belmar",
-        "email" : "car.pardo@duocuc.cl",
-        "mensaje" : "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce posuere risus odio, ac dapibus nibh dignissim non. Nulla facilisi. Donec sit amet elit gravida, finibus tortor et, facilisis lectus. Interdum et malesuada fames ac ante ipsum primis in faucibus. Integer ullamcorper lacus eget eleifend iaculis. Nullam ullamcorper mollis ornare. Vivamus urna nunc, finibus in urna vitae, sodales viverra sapien. Duis id vehicula nunc. Ut porta scelerisque sodales. Maecenas vitae risus libero. Etiam sit amet lectus lorem. Donec eget tellus massa. Curabitur aliquam libero magna, et egestas ante bibendum tristique. Donec ac risus et odio tristique pellentesque. Proin erat ex, rutrum ut cursus id, suscipit ac leo. In ut pharetra quam."
-    }
-    form = ContactoForm(data = data)
-    assert form.is_valid()
+class TestPedido(TestCase):
+    def test_crear_pedido(self):
+        usuario = User.objects.create_user(username='testuser', password='12345')
+        carrito = Carrito.objects.create(usuario=usuario)
+        pedido = Pedido.objects.create(usuario=usuario, carrito=carrito)
+        self.assertEqual(pedido.usuario.username, 'testuser')
 
-# TEST CREAR FORMULARIO DE CONTACTO SIN EMAIL
-@pytest.mark.django_db
-def test_form_contacto_con_error():
-    data = {
-        "nombre": "Carlos Pardo Belmar",
-        "mensaje": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce posuere risus odio, ac dapibus nibh dignissim non. Nulla facilisi. Donec sit amet elit gravida, finibus tortor et, facilisis lectus. Interdum et malesuada fames ac ante ipsum primis in faucibus. Integer ullamcorper lacus eget eleifend iaculis. Nullam ullamcorper mollis ornare. Vivamus urna nunc, finibus in urna vitae, sodales viverra sapien. Duis id vehicula nunc. Ut porta scelerisque sodales. Maecenas vitae risus libero. Etiam sit amet lectus lorem. Donec eget tellus massa. Curabitur aliquam libero magna, et egestas ante bibendum tristique. Donec ac risus et odio tristique pellentesque. Proin erat ex, rutrum ut cursus id, suscipit ac leo. In ut pharetra quam."
-    }
-    form = ContactoForm(data=data)
+    def test_sin_usuario(self):
+        carrito = Carrito.objects.create(usuario=User.objects.create_user(username='testuser', password='12345'))
+        pedido = Pedido(carrito=carrito)
+        with self.assertRaises(ValidationError) as context:
+            pedido.full_clean()
+        self.assertIn('Este campo no puede ser nulo.', str(context.exception))
 
-    # Verificar que al intentar validar el formulario se lance un ValidationError
-    with pytest.raises(ValidationError):
-        form.is_valid()
+class TestDetallePedido(TestCase):
+    def test_crear_detalle_pedido(self):
+        usuario = User.objects.create_user(username='testuser', password='12345')
+        carrito = Carrito.objects.create(usuario=usuario)
+        pedido = Pedido.objects.create(usuario=usuario, carrito=carrito)
+        categoria = CategoriaProducto.objects.create(categoria='Herramientas')
+        tipo = TipoProducto.objects.create(tipo='Manual')
+        producto = Producto.objects.create(
+            nombre='Martillo',
+            precio=9990,
+            stock=50,
+            descripcion='Breve Descripcion del producto',
+            en_oferta=False
+        )
+        producto.categoria.add(categoria)
+        producto.tipo.add(tipo)
+        detalle_pedido = DetallePedido.objects.create(pedido=pedido, producto=producto, cantidad=1, precio=9990, subtotal=9990)
+        self.assertEqual(detalle_pedido.pedido.usuario.username, 'testuser')
+
+class TestBoleta(TestCase):
+    def test_crear_boleta(self):
+        usuario = User.objects.create_user(username='testuser', password='12345')
+        boleta = Boleta.objects.create(usuario=usuario, total=9990)
+        self.assertEqual(boleta.usuario.username, 'testuser')
+
+class TestDetalleBoleta(TestCase):
+    def test_crear_detalle_boleta(self):
+        usuario = User.objects.create_user(username='testuser', password='12345')
+        boleta = Boleta.objects.create(usuario=usuario, total=9990)
+        categoria = CategoriaProducto.objects.create(categoria='Herramientas')
+        tipo = TipoProducto.objects.create(tipo='Manual')
+        producto = Producto.objects.create(
+            nombre='Martillo',
+            precio=9990,
+            stock=50,
+            descripcion='Breve Descripcion del producto',
+            en_oferta=False
+        )
+        producto.categoria.add(categoria)
+        producto.tipo.add(tipo)
+        detalle_boleta = DetalleBoleta.objects.create(boleta=boleta, producto=producto, cantidad=1, subtotal=9990)
+        self.assertEqual(detalle_boleta.boleta.usuario.username, 'testuser')
+
+class TestContacto(TestCase):
+    def test_crear_contacto_valido(self):
+        contacto = Contacto.objects.create(
+            nombre='Juan Perez',
+            email='juan.perez@example.com',
+            mensaje='Hola, necesito información.'
+        )
+        self.assertEqual(contacto.nombre, 'Juan Perez')
+        self.assertEqual(contacto.email, 'juan.perez@example.com')
+        self.assertEqual(contacto.mensaje, 'Hola, necesito información.')
+
+    def test_nombre_vacio(self):
+        contacto = Contacto(nombre='', email='juan.perez@example.com', mensaje='Hola, necesito información.')
+        with self.assertRaises(ValidationError) as context:
+            contacto.full_clean()
+        self.assertIn('El campo "nombre" no puede estar vacio.', str(context.exception))
+
+    def test_nombre_demasiado_corto(self):
+        contacto = Contacto(nombre='Jo', email='juan.perez@example.com', mensaje='Hola, necesito información.')
+        with self.assertRaises(ValidationError) as context:
+            contacto.full_clean()
+        self.assertIn('El campo "nombre" debe tener al menos 3 caracteres', str(context.exception))
+
+    def test_nombre_demasiado_largo(self):
+        contacto = Contacto(nombre='J' * 31, email='juan.perez@example.com', mensaje='Hola, necesito información.')
+        with self.assertRaises(ValidationError) as context:
+            contacto.full_clean()
+        self.assertIn('El campo "nombre" no puede tener mas de 30 caracteres', str(context.exception))
+
+    def test_email_vacio(self):
+        contacto = Contacto(nombre='Juan Perez', email='', mensaje='Hola, necesito información.')
+        with self.assertRaises(ValidationError) as context:
+            contacto.full_clean()
+        self.assertIn('El campo "email" no puede esta vacio', str(context.exception))
+
+    def test_email_demasiado_largo(self):
+        contacto = Contacto(nombre='Juan Perez', email='a' * 101 + '@example.com', mensaje='Hola, necesito información.')
+        with self.assertRaises(ValidationError) as context:
+            contacto.full_clean()
+        self.assertIn('El campo "email" no puede tener mas de 100 caracteres', str(context.exception))
+
+    def test_mensaje_vacio(self):
+        contacto = Contacto(nombre='Juan Perez', email='juan.perez@example.com', mensaje='')
+        with self.assertRaises(ValidationError) as context:
+            contacto.full_clean()
+        self.assertIn('El campo "mensaje" no puede estar vacio.', str(context.exception))

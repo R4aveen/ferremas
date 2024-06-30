@@ -314,6 +314,12 @@ class TestContacto(TestCase):
             contacto.full_clean()
         self.assertIn('El campo "nombre" no puede estar vacio.', str(context.exception))
 
+    def test_nombre_numeros(self):
+        contacto = Contacto(nombre=12345, email='juan.perez@example.com', mensaje='Hola, necesito información.')
+        with self.assertRaises(ValidationError) as context:
+            contacto.full_clean()
+        self.assertIn('El campo "nombre" no puede contener números.', str(context.exception))
+
     def test_nombre_demasiado_corto(self):
         contacto = Contacto(nombre='Jo', email='juan.perez@example.com', mensaje='Hola, necesito información.')
         with self.assertRaises(ValidationError) as context:

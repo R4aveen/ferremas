@@ -168,6 +168,9 @@ class Contacto(models.Model):
         if not self.nombre:
             raise ValidationError('El campo "nombre" no puede estar vacio.')
         
+        if any(char.isdigit() for char in self.nombre):
+            raise ValidationError('El campo "nombre" no puede contener números.')
+        
         if len(self.nombre) < 3:
             raise ValidationError('El campo "nombre" debe tener al menos 3 caracteres')
         

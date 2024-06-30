@@ -1,7 +1,11 @@
-from django.test import TestCase
+from django.test import TestCase, Client
 from django.core.exceptions import ValidationError
 from .models import *
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
+from rest_framework.test import APITestCase
+from rest_framework import status
+from django.urls import reverse
+from django.contrib.auth import authenticate, login, logout
 
 class TestCategoria(TestCase):
     def test_crear(self):
@@ -394,3 +398,130 @@ class TestUser(TestCase):
 
         self.assertEqual(usuario.username, 'PardoDev')
         self.assertTrue(usuario.check_password('asdasd123123'))
+
+class CategoriaProductoAPITestCase(APITestCase):
+    def setUp(self):
+        self.categoria1 = CategoriaProducto.objects.create(categoria='Electrónica')
+        self.categoria2 = CategoriaProducto.objects.create(categoria='Hogar')
+        self.list_url = reverse('categoriaproducto-list') 
+
+    def test_listar_categorias(self):
+        response = self.client.get(self.list_url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 2)
+
+    def test_crear_categoria(self):
+        data = {
+            'categoria': 'Juguetes'
+        }
+        response = self.client.post(self.list_url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(CategoriaProducto.objects.count(), 3)
+        self.assertEqual(CategoriaProducto.objects.last().categoria, 'Juguetes')
+
+    def test_obtener_detalle_categoria(self):
+        detail_url = reverse('categoriaproducto-detail', kwargs={'pk': self.categoria1.pk})
+        response = self.client.get(detail_url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['categoria'], 'Electrónica')
+
+    def test_actualizar_categoria(self):
+        detail_url = reverse('categoriaproducto-detail', kwargs={'pk': self.categoria1.pk})
+        data = {
+            'categoria': 'Electrónica Actualizada'
+        }
+        response = self.client.put(detail_url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.categoria1.refresh_from_db()
+        self.assertEqual(self.categoria1.categoria, 'Electrónica Actualizada')
+
+    def test_eliminar_categoria(self):
+        detail_url = reverse('categoriaproducto-detail', kwargs={'pk': self.categoria1.pk})
+        response = self.client.delete(detail_url)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(CategoriaProducto.objects.count(), 1)
+
+    def test_crear_categoria_con_error(self):
+        data = {
+            'categoria': 'A' 
+        }
+        response = self.client.post(self.list_url, data, format='json')
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+class LoginViewTestCase(TestCase):
+    def setUp(self):
+        self.client = Client()
+        self.url = reverse('LOGIN')  
+
+    def test_login(self):
+        data = {
+            'username': 'testuser',
+            'password': 'password123',
+        }
+
+        User.objects.create_user(username='testuser', password='password123')
+
+        response = self.client.post(self.url, data)
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, reverse('PRODUCTOS'))  
+
+    def test_login_invalid_credentials(self):
+        data = {
+            'username': 'testuser',
+            'password': 'wrongpassword',
+        }
+
+        User.objects.create_user(username='testuser', password='password123')
+
+        response = self.client.post(self.url, data)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Credenciales inválidas")
+
+class CerrarSesionViewTestCase(TestCase):
+    def setUp(self):
+        self.client = Client()
+        self.url = reverse('CERRAR_SESION')
+
+    def test_cerrar_sesion(self):
+        user = User.objects.create_user(username='testuser', password='password123')
+        self.client.login(username='testuser', password='password123')
+
+        response = self.client.get(self.url)
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, reverse('INDEX'))
+
+class RegistroViewTestCase(TestCase):
+    def setUp(self):
+        self.client = Client()
+        self.url = reverse('REGISTRO')
+
+    def test_registro_exitoso(self):
+        data = {
+            'username': 'newuser',
+            'email': 'newuser@example.com',
+            'number': '123456789',
+            'password': 'password123',
+            'repeat-password': 'password123',
+        }
+
+        response = self.client.post(self.url, data)
+
+        self.assertEqual(response.status_code, 200)
+
+    def test_registro_con_passwords_diferentes(self):
+        data = {
+            'username': 'newuser',
+            'email': 'newuser@example.com',
+            'number': '123456789',
+            'password': 'password123',
+            'repeat-password': 'differentpassword',
+        }
+
+        response = self.client.post(self.url, data)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Las contraseñas no coinciden")

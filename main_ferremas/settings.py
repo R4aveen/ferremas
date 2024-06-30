@@ -230,5 +230,5 @@ ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS = 7
 
 ## config test
 
-if 'test'  is sys.argv:
+if sys.argv=='test':
     STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'

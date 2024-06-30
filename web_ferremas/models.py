@@ -15,10 +15,15 @@ class CategoriaProducto(models.Model):
     def clean(self):
         if not self.categoria:
             raise ValidationError('El campo categoria no puede estar vacío.')
+        
         if len(self.categoria) < 3:
             raise ValidationError('El nombre de categoria debe tener al menos 3 caracteres.')
+        
         if len(self.categoria) >= 25:
             raise ValidationError('El nombre de categoria no puede tener más de 25 caracteres.')
+        
+        if any(char.isdigit() for char in self.categoria):
+            raise ValidationError('El campo "categoria" no puede contener números.')
     
 class TipoProducto(models.Model):
     id = models.AutoField(primary_key=True, auto_created=True)
@@ -30,10 +35,15 @@ class TipoProducto(models.Model):
     def clean(self):
         if not self.tipo:
             raise ValidationError('El campo tipo no puede estar vacío.')
+        
         if len(self.tipo) < 3:
             raise ValidationError('El nombre de tipo debe tener al menos 3 caracteres.')
+        
         if len(self.tipo) >= 25:
             raise ValidationError('El nombre de tipo no puede tener más de 25 caracteres.')
+        
+        if any(char.isdigit() for char in self.tipo):
+            raise ValidationError('El campo "tipo" no puede contener números.')
     
 class Producto(models.Model):
     id = models.AutoField(primary_key=True, auto_created=True)
@@ -52,14 +62,22 @@ class Producto(models.Model):
     def clean(self):
         if not self.nombre:
             raise ValidationError('El campo "nombre" no puede estar vacío.')
+        
+        if any(char.isdigit() for char in self.nombre):
+            raise ValidationError('El campo "nombre" no puede contener números.')
+        
         if self.precio <= 0:
             raise ValidationError('El precio debe ser mayor que cero.')
+        
         if self.stock < 0:
             raise ValidationError('El stock no puede ser negativo.')
+        
         if not self.categoria.exists():
             raise ValidationError('El campo "categoria" no puede estar vacio.')
+        
         if not self.tipo.exists():
             raise ValidationError('El campo "tipo" no puede estar vacio.')
+        
     
 class ProductoOferta(models.Model):
     producto = models.OneToOneField(Producto, primary_key=True, on_delete=models.CASCADE)
@@ -148,6 +166,10 @@ class Boleta(models.Model):
     usuario = models.ForeignKey(User, on_delete=models.CASCADE, default=1)
     total = models.PositiveIntegerField()
     fecha = models.DateTimeField(auto_now_add=True)
+
+    def clean(self):
+        if self.total < 0:
+            raise ValidationError('El campo "total" no puede tener numeros negativos.')
 
 class DetalleBoleta(models.Model):
     boleta = models.ForeignKey(Boleta, on_delete=models.CASCADE)

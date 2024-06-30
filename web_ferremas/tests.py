@@ -26,6 +26,12 @@ class TestCategoria(TestCase):
             categoria.full_clean()
         self.assertIn('El nombre de categoria no puede tener más de 25 caracteres.', str(context.exception))
 
+    def test_numeros(self):
+        categoria = CategoriaProducto(categoria=12345)
+        with self.assertRaises(ValidationError) as context:
+            categoria.full_clean()
+        self.assertIn('El campo "categoria" no puede contener números.', str(context.exception))
+
 class TestTipo(TestCase):
     def test_crear(self):
         tipo = TipoProducto.objects.create(tipo='Herramientas de corte')
@@ -48,6 +54,12 @@ class TestTipo(TestCase):
         with self.assertRaises(ValidationError) as context:
             tipo.full_clean()
         self.assertIn('El nombre de tipo no puede tener más de 25 caracteres.', str(context.exception))
+
+    def test_numeros(self):
+        tipo = TipoProducto(tipo=12345)
+        with self.assertRaises(ValidationError) as context:
+            tipo.full_clean()
+        self.assertIn('El campo "tipo" no puede contener números.', str(context.exception))
 
 class TestProducto(TestCase):
     def test_crear(self):
@@ -91,6 +103,25 @@ class TestProducto(TestCase):
         with self.assertRaises(ValidationError) as context:
             producto.full_clean()
         self.assertIn('El campo "nombre" no puede estar vacío.', str(context.exception))
+
+    def test_numeros(self):
+        categoria = CategoriaProducto.objects.create(categoria='Herramientas')
+        tipo = TipoProducto.objects.create(tipo='Manual')
+
+        producto = Producto(
+            nombre=12345,
+            precio=9990,
+            stock=50,
+            descripcion='Breve Descripcion del producto',
+            en_oferta=False
+        )
+        producto.save()
+        producto.categoria.add(categoria)
+        producto.tipo.add(tipo)
+
+        with self.assertRaises(ValidationError) as context:
+            producto.full_clean()
+        self.assertIn('El campo "nombre" no puede contener números.', str(context.exception))
 
     def test_precio_invalido(self):
         categoria = CategoriaProducto.objects.create(categoria='Herramientas')
@@ -192,7 +223,6 @@ class TestOfertaProducto(TestCase):
 
         self.assertIn('El precio oferta no puede ser negativo.', str(context.exception))
 
-
 class TestCarrito(TestCase):
     def test_crear_carrito(self):
         usuario = User.objects.create_user(username='testuser', password='12345')
@@ -279,6 +309,14 @@ class TestBoleta(TestCase):
         boleta = Boleta.objects.create(usuario=usuario, total=9990)
         self.assertEqual(boleta.usuario.username, 'testuser')
 
+    def test_total_negativo(self):
+        usuario = User.objects.create_user(username='testuser', password='12345')
+        boleta = Boleta(usuario=usuario, total=-5990)
+
+        with self.assertRaises(ValidationError) as context:
+            boleta.full_clean()
+        self.assertIn('El campo "total" no puede tener numeros negativos.', str(context.exception))
+
 class TestDetalleBoleta(TestCase):
     def test_crear_detalle_boleta(self):
         usuario = User.objects.create_user(username='testuser', password='12345')
@@ -349,3 +387,10 @@ class TestContacto(TestCase):
         with self.assertRaises(ValidationError) as context:
             contacto.full_clean()
         self.assertIn('El campo "mensaje" no puede estar vacio.', str(context.exception))
+
+class TestUser(TestCase):
+    def test_crear(self):
+        usuario = User.objects.create_user(username='PardoDev', password='asdasd123123')
+
+        self.assertEqual(usuario.username, 'PardoDev')
+        self.assertTrue(usuario.check_password('asdasd123123'))

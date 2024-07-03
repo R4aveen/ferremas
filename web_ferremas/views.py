@@ -949,7 +949,7 @@ def generar_pdf_transaccion(request, pedido_id):
     response.write(pdf)
     return response
 
-##### PardoDev JAJAJA
+##### PardoDev es dummy JAJAJA by r4veeen JASJSAJJZA
 
 
 import random
